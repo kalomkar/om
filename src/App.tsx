@@ -1,0 +1,355 @@
+import { useState, useEffect, useCallback } from 'react';
+import { Navbar } from './components/Navbar';
+import { StudentForm } from './components/StudentForm';
+import { TeacherDashboard } from './components/TeacherDashboard';
+import { TeacherLogin } from './components/TeacherLogin';
+import { RequestTracker } from './components/RequestTracker';
+import { SubmissionSuccessModal } from './components/SubmissionSuccessModal';
+import { ShareModal } from './components/ShareModal';
+import { StudentRequest, RequestStatus } from './types';
+
+const INITIAL_SEED_DATA: StudentRequest[] = [
+  {
+    id: 'REQ-10482',
+    studentName: 'Aarav Sharma',
+    rollNumber: 'CS-2024-42',
+    className: 'B.Tech CS 3rd Year',
+    section: 'Section B',
+    phone: '+91 98765 43210',
+    email: 'aarav.sharma@college.edu',
+    category: 'certificate',
+    title: 'Bonafide Certificate for National Scholarship Application',
+    description: 'Sir, I need a Bonafide Certificate with college stamp to apply for the State Merit Scholarship. The last date of submission is next Monday.',
+    urgency: 'high',
+    status: 'pending',
+    createdAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
+    updatedAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
+    notificationSent: true,
+    notificationDetails: {
+      smsSent: true,
+      emailSent: true,
+      sentAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
+    }
+  },
+  {
+    id: 'REQ-10481',
+    studentName: 'Priya Verma',
+    rollNumber: 'CS-2024-18',
+    className: 'B.Tech CS 3rd Year',
+    section: 'Section A',
+    phone: '+91 98123 45678',
+    email: 'priya.verma@college.edu',
+    category: 'leave',
+    title: 'Medical Leave Application (3 Days)',
+    description: 'Respected Teacher, I am down with viral fever. Requesting permission for leave from 10th to 12th. Medical prescription is attached.',
+    urgency: 'urgent',
+    attachedFile: {
+      name: 'medical_certificate_prescription.pdf',
+      size: 145200,
+      type: 'application/pdf',
+    },
+    status: 'in_review',
+    teacherRemarks: 'Prescription noted. Get well soon and submit lab assignments upon return.',
+    createdAt: new Date(Date.now() - 3600 * 1000 * 20).toISOString(),
+    updatedAt: new Date(Date.now() - 3600 * 1000 * 10).toISOString(),
+    notificationSent: true,
+    notificationDetails: {
+      smsSent: true,
+      emailSent: true,
+      sentAt: new Date(Date.now() - 3600 * 1000 * 20).toISOString(),
+    }
+  },
+  {
+    id: 'REQ-10479',
+    studentName: 'Rahul Patel',
+    rollNumber: 'CS-2024-55',
+    className: 'B.Tech CS 3rd Year',
+    section: 'Section B',
+    phone: '+91 97234 56789',
+    email: 'rahul.patel@college.edu',
+    category: 'document',
+    title: 'Official 4th Semester Marksheet Duplicate Copy',
+    description: 'Sir, I have misplaced my hardcopy marksheet of 4th Semester and need a verified duplicate copy for internship verification.',
+    urgency: 'normal',
+    status: 'approved',
+    teacherRemarks: 'Verified and signed. You can collect the printed original from Admin Block Counter #3.',
+    createdAt: new Date(Date.now() - 3600 * 1000 * 48).toISOString(),
+    updatedAt: new Date(Date.now() - 3600 * 1000 * 18).toISOString(),
+    notificationSent: true,
+    notificationDetails: {
+      smsSent: true,
+      emailSent: true,
+      sentAt: new Date(Date.now() - 3600 * 1000 * 48).toISOString(),
+    }
+  }
+];
+
+export default function App() {
+  const [portal, setPortal] = useState<'student' | 'teacher'>('student');
+  const [studentView, setStudentView] = useState<'form' | 'track'>('form');
+  const [isTeacherLoggedIn, setIsTeacherLoggedIn] = useState<boolean>(() => {
+    return localStorage.getItem('teacher_logged_in') === 'true';
+  });
+
+  const [requests, setRequests] = useState<StudentRequest[]>(() => {
+    try {
+      const cached = localStorage.getItem('student_requests_cache');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      // ignore
+    }
+    return INITIAL_SEED_DATA;
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [submittedRequest, setSubmittedRequest] = useState<StudentRequest | null>(null);
+  const [trackingId, setTrackingId] = useState<string>('');
+  const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string>('');
+
+  const portalUrl = typeof window !== 'undefined' ? window.location.origin : '';
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage('');
+    }, 3500);
+  };
+
+  // Check URL query parameters for direct links (e.g. ?mode=teacher or ?mode=student or ?track=REQ-XXXX)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const mode = params.get('mode') || params.get('portal');
+    const track = params.get('track');
+
+    if (mode === 'teacher') {
+      setPortal('teacher');
+    } else if (mode === 'student') {
+      setPortal('student');
+      setStudentView('form');
+    } else if (mode === 'track' || track) {
+      setPortal('student');
+      setStudentView('track');
+      if (track) setTrackingId(track);
+    }
+  }, []);
+
+  // Fetch requests from database with resilient fallback and automatic retries
+  const fetchRequests = useCallback(async (retryCount = 0) => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+      const res = await fetch('/api/requests', {
+        headers: { 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setRequests(data);
+          try {
+            localStorage.setItem('student_requests_cache', JSON.stringify(data));
+          } catch {
+            // storage limit guard
+          }
+        }
+      } else if (retryCount < 2) {
+        setTimeout(() => fetchRequests(retryCount + 1), 2000);
+      }
+    } catch {
+      // Quiet recovery: cached data is already active in state
+      if (retryCount < 2) {
+        setTimeout(() => fetchRequests(retryCount + 1), 2500);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRequests();
+    // Periodic refresh every 20s to catch new submissions
+    const interval = setInterval(fetchRequests, 20000);
+    return () => clearInterval(interval);
+  }, [fetchRequests]);
+
+  // Handle successful student submission
+  const handleSubmissionSuccess = (newRequest: StudentRequest) => {
+    setRequests(prev => {
+      const updated = [newRequest, ...prev.filter(r => r.id !== newRequest.id)];
+      try {
+        localStorage.setItem('student_requests_cache', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    setSubmittedRequest(newRequest);
+    showToast(`🎉 Success! Request #${newRequest.id} saved.`);
+  };
+
+  // Handle status update by teacher
+  const handleUpdateRequest = async (id: string, status: RequestStatus, remarks?: string) => {
+    // Optimistic local update
+    setRequests(prev => {
+      const next = prev.map(r => r.id === id ? { ...r, status, teacherRemarks: remarks, updatedAt: new Date().toISOString() } : r);
+      try {
+        localStorage.setItem('student_requests_cache', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+
+    try {
+      const res = await fetch(`/api/requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, teacherRemarks: remarks }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.request) {
+          setRequests(prev => {
+            const next = prev.map(r => r.id === id ? data.request : r);
+            try { localStorage.setItem('student_requests_cache', JSON.stringify(next)); } catch {}
+            return next;
+          });
+        }
+      }
+      showToast(`Updated ${id} to ${status.replace('_', ' ')}`);
+    } catch {
+      showToast(`Updated ${id} locally`);
+    }
+  };
+
+  // Handle request deletion
+  const handleDeleteRequest = async (id: string) => {
+    if (!window.confirm(`Are you sure you want to delete request ${id}?`)) return;
+
+    setRequests(prev => {
+      const next = prev.filter(r => r.id !== id);
+      try {
+        localStorage.setItem('student_requests_cache', JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+
+    try {
+      await fetch(`/api/requests/${id}`, { method: 'DELETE' });
+      showToast(`Request ${id} deleted.`);
+    } catch {
+      showToast(`Request ${id} deleted locally.`);
+    }
+  };
+
+  // Teacher Login handler
+  const handleTeacherLoginSuccess = () => {
+    setIsTeacherLoggedIn(true);
+    localStorage.setItem('teacher_logged_in', 'true');
+    setPortal('teacher');
+    showToast('👨‍🏫 Welcome, Teacher! Successfully logged in.');
+  };
+
+  // Teacher Logout handler
+  const handleTeacherLogout = () => {
+    setIsTeacherLoggedIn(false);
+    localStorage.removeItem('teacher_logged_in');
+    setPortal('student');
+    showToast('Logged out successfully.');
+  };
+
+  // Direct track navigation from receipt modal
+  const handleTrackDirectly = (id: string) => {
+    setSubmittedRequest(null);
+    setTrackingId(id);
+    setPortal('student');
+    setStudentView('track');
+  };
+
+  const pendingCount = requests.filter(r => r.status === 'pending').length;
+
+  return (
+    <div className="min-h-screen bg-slate-50/60 text-slate-800 flex flex-col antialiased">
+      {/* Dynamic Navbar */}
+      <Navbar
+        portal={portal}
+        studentView={studentView}
+        onSelectStudentView={(v) => {
+          setPortal('student');
+          setStudentView(v);
+        }}
+        isTeacherLoggedIn={isTeacherLoggedIn}
+        onGoToTeacherLogin={() => {
+          setPortal('teacher');
+        }}
+        onTeacherLogout={handleTeacherLogout}
+        onOpenShare={() => setIsShareModalOpen(true)}
+        onGoToStudent={() => {
+          setPortal('student');
+          setStudentView('form');
+        }}
+        pendingCount={pendingCount}
+      />
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-slate-700 text-xs font-medium flex items-center gap-2 animate-bounce-short">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Main View Area */}
+      <main className="flex-1">
+        {portal === 'student' ? (
+          /* Student Portal Views */
+          studentView === 'form' ? (
+            <StudentForm onSuccess={handleSubmissionSuccess} />
+          ) : (
+            <RequestTracker initialTrackingId={trackingId} />
+          )
+        ) : (
+          /* Teacher Portal Views */
+          !isTeacherLoggedIn ? (
+            <TeacherLogin
+              onLoginSuccess={handleTeacherLoginSuccess}
+              onGoToStudent={() => {
+                setPortal('student');
+                setStudentView('form');
+              }}
+            />
+          ) : (
+            <TeacherDashboard
+              requests={requests}
+              isLoading={isLoading}
+              onRefresh={fetchRequests}
+              onUpdateRequest={handleUpdateRequest}
+              onDeleteRequest={handleDeleteRequest}
+              onOpenShareModal={() => setIsShareModalOpen(true)}
+              portalUrl={portalUrl}
+            />
+          )
+        )}
+      </main>
+
+      {/* Submission Success & Receipt Modal */}
+      {submittedRequest && (
+        <SubmissionSuccessModal
+          request={submittedRequest}
+          onClose={() => setSubmittedRequest(null)}
+          onTrack={handleTrackDirectly}
+        />
+      )}
+
+      {/* Share Modal with QR Code and WhatsApp */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        portalUrl={portalUrl}
+      />
+    </div>
+  );
+}

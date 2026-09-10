@@ -1,0 +1,7 @@
+{
+  "name": "Student Requirement Portal",
+  "description": "Student requirement and document submission portal with live teacher dashboard, document upload, and submission confirmation tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
