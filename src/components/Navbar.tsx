@@ -112,15 +112,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Action Controls */}
         <div className="flex items-center gap-2">
           {portal === 'student' ? (
-            /* Student Portal -> Button to go to Teacher Login */
-            <button
-              id="nav-go-to-teacher-btn"
-              onClick={onGoToTeacherLogin}
-              className="flex items-center gap-1.5 px-3 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-xs hover:shadow-sm transition-all active:scale-95"
-            >
-              <Lock className="w-3.5 h-3.5 text-amber-400" />
-              <span>Teacher Login</span>
-            </button>
+            /* Student Portal -> Clean helpdesk badge (Teacher Login removed as requested) */
+            <div className="flex items-center gap-1.5 px-2.5 py-1 text-slate-500 text-xs font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+              <span>Student Portal</span>
+            </div>
           ) : isTeacherLoggedIn ? (
             /* Teacher Portal (Logged In) -> Share & Logout & Switch to Student buttons */
             <div className="flex items-center gap-2">

@@ -350,6 +350,22 @@ export default function App() {
         onClose={() => setIsShareModalOpen(false)}
         portalUrl={portalUrl}
       />
+
+      {/* Discreet Minimal Footer */}
+      <footer className="py-4 text-center text-xs text-slate-400 border-t border-slate-200/60 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <p>© {new Date().getFullYear()} Student Request Desk • All submissions are encrypted and securely stored</p>
+          {portal === 'student' && (
+            <button
+              id="footer-staff-access-btn"
+              onClick={() => setPortal('teacher')}
+              className="text-slate-400 hover:text-slate-600 text-[11px] transition-colors"
+            >
+              Faculty / Staff Access
+            </button>
+          )}
+        </div>
+      </footer>
     </div>
   );
 }
