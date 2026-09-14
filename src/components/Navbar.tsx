@@ -8,8 +8,10 @@ import {
   Lock,
   LogOut,
   LayoutDashboard,
-  ArrowLeft
+  ArrowLeft,
+  ShieldCheck
 } from 'lucide-react';
+import { getActiveTeacherSession } from '../lib/teacherService';
 
 interface NavbarProps {
   portal: 'student' | 'teacher';
@@ -97,9 +99,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           </nav>
         ) : isTeacherLoggedIn ? (
           <div className="hidden md:flex items-center gap-2">
-            <span className="text-xs px-2.5 py-1 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 font-semibold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Teacher Logged In
+            <span className="text-xs px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 font-semibold flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+              <span>Teacher ID: {getActiveTeacherSession()?.teacherId || '9771'}</span>
+              <span className="text-[10px] text-blue-600 font-normal truncate max-w-[120px]">
+                ({getActiveTeacherSession()?.name || 'Faculty'})
+              </span>
             </span>
             {pendingCount > 0 && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold border border-amber-200">

@@ -10,8 +10,12 @@ import {
   Eye, 
   EyeOff,
   ArrowLeft,
-  ShieldCheck
+  ShieldCheck,
+  UserPlus
 } from 'lucide-react';
+import { authenticateTeacher, PRIMARY_TEACHER } from '../lib/teacherService';
+import { AddTeacherModal } from './AddTeacherModal';
+import { TeacherAccount } from '../types';
 
 interface TeacherLoginProps {
   onLoginSuccess: () => void;
@@ -26,47 +30,55 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
 
-  // Accepted credentials
-  const DEMO_EMAIL = 'teacher@college.edu';
-  const DEMO_PASS = 'teacher123';
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+    setInfoMessage('');
     setIsLoading(true);
 
-    setTimeout(() => {
-      const cleanId = teacherId.trim().toLowerCase();
-      // Allow teacher@college.edu, teacher, or admin
-      if (
-        (cleanId === 'teacher@college.edu' || cleanId === 'teacher' || cleanId === 'admin') &&
-        password === DEMO_PASS
-      ) {
+    try {
+      const result = await authenticateTeacher(teacherId, password);
+      if (result.success) {
         setIsLoading(false);
         onLoginSuccess();
       } else {
         setIsLoading(false);
-        setErrorMessage('Invalid credentials. Please use the demo credentials provided below.');
+        setErrorMessage(result.error || 'अमान्य क्रेडेंशियल्स। कृपया Teacher ID: 9771 एवं Password: 123456 दर्ज करें।');
       }
-    }, 400);
+    } catch {
+      setIsLoading(false);
+      setErrorMessage('लॉगिन करने में त्रुटि आई। कृपया पुनः प्रयास करें।');
+    }
   };
 
-  const handleQuickDemoLogin = () => {
-    setTeacherId(DEMO_EMAIL);
-    setPassword(DEMO_PASS);
+  const handleQuickOfficialLogin = async () => {
+    setTeacherId(PRIMARY_TEACHER.teacherId);
+    setPassword(PRIMARY_TEACHER.password);
     setErrorMessage('');
+    setInfoMessage('');
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+
+    const result = await authenticateTeacher(PRIMARY_TEACHER.teacherId, PRIMARY_TEACHER.password);
+    setIsLoading(false);
+    if (result.success) {
       onLoginSuccess();
-    }, 300);
+    }
+  };
+
+  const handleAccountCreated = (newAcc: TeacherAccount) => {
+    setTeacherId(newAcc.teacherId);
+    setPassword(newAcc.password);
+    setInfoMessage(`नया शिक्षक खाता ${newAcc.name} (ID: ${newAcc.teacherId}) बन गया है। आप सीधे "Login to Dashboard" पर क्लिक कर सकते हैं!`);
+    setIsAddTeacherOpen(false);
   };
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full space-y-6 animate-fade-in">
+      <div className="max-w-md w-full space-y-5 animate-fade-in">
         {/* Header Branding */}
         <div className="text-center space-y-2">
           <div className="w-14 h-14 bg-gradient-to-tr from-blue-700 to-indigo-700 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
@@ -76,46 +88,64 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
             Teacher / Admin Login
           </h1>
           <p className="text-xs text-slate-500">
-            शिक्षक पोर्टल में लॉगिन करें और छात्रों के आवेदन देखें
+            SRN Mehta College • शिक्षक एवं प्रशासक लॉगिन पोर्टल
           </p>
         </div>
 
-        {/* Prominent Demo Credentials Card */}
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50/70 border border-amber-200/80 rounded-2xl p-4 shadow-2xs space-y-3">
+        {/* Official College Teacher Credentials Card */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50/70 border border-blue-200/90 rounded-2xl p-4 shadow-2xs space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
-              <Sparkles className="w-4 h-4 text-amber-600" />
-              <span>Dummy Credentials (परीक्षण के लिए)</span>
+            <div className="flex items-center gap-2 text-blue-950 font-bold text-xs">
+              <Sparkles className="w-4 h-4 text-blue-600" />
+              <span>Official Teacher Credentials (कॉलेज क्रेडेंशियल्स)</span>
             </div>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-900 font-semibold">
-              Ready to Test
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-200/80 text-blue-900 font-semibold">
+              Authorized
             </span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="bg-white/80 p-2 rounded-xl border border-amber-200/60">
-              <span className="text-[10px] text-slate-400 block">Teacher ID / Email:</span>
-              <span className="font-mono font-semibold text-slate-800 text-xs select-all">teacher@college.edu</span>
+            <div className="bg-white/90 p-2.5 rounded-xl border border-blue-200/70">
+              <span className="text-[10px] text-slate-400 block font-medium">Teacher ID:</span>
+              <span className="font-mono font-bold text-blue-900 text-sm select-all">9771</span>
             </div>
-            <div className="bg-white/80 p-2 rounded-xl border border-amber-200/60">
-              <span className="text-[10px] text-slate-400 block">Password:</span>
-              <span className="font-mono font-semibold text-slate-800 text-xs select-all">teacher123</span>
+            <div className="bg-white/90 p-2.5 rounded-xl border border-blue-200/70">
+              <span className="text-[10px] text-slate-400 block font-medium">Password:</span>
+              <span className="font-mono font-bold text-blue-900 text-sm select-all">123456</span>
             </div>
           </div>
 
-          <button
-            type="button"
-            id="quick-demo-login-btn"
-            onClick={handleQuickDemoLogin}
-            className="w-full py-2 px-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-[0.99]"
-          >
-            <KeyRound className="w-3.5 h-3.5" />
-            <span>One-Click Quick Login (1-क्लिक में लॉगिन करें)</span>
-          </button>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <button
+              type="button"
+              id="quick-official-login-btn"
+              onClick={handleQuickOfficialLogin}
+              className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-[0.99]"
+            >
+              <KeyRound className="w-3.5 h-3.5" />
+              <span>1-Click Auto Fill & Login</span>
+            </button>
+
+            <button
+              type="button"
+              id="open-add-teacher-modal-btn"
+              onClick={() => setIsAddTeacherOpen(true)}
+              className="w-full py-2 px-3 bg-white hover:bg-slate-50 text-blue-700 border border-blue-300 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-[0.99]"
+            >
+              <UserPlus className="w-3.5 h-3.5 text-blue-600" />
+              <span>+ Add New Teacher</span>
+            </button>
+          </div>
         </div>
 
         {/* Login Form */}
-        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-5">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+          {infoMessage && (
+            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs">
+              {infoMessage}
+            </div>
+          )}
+
           {errorMessage && (
             <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2 text-rose-700 text-xs animate-shake">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
@@ -126,14 +156,14 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Teacher ID or Email Address
+                Teacher ID (शिक्षक आईडी)
               </label>
               <div className="relative">
                 <input
                   id="teacher-id-input"
                   type="text"
                   required
-                  placeholder="teacher@college.edu"
+                  placeholder="9771"
                   value={teacherId}
                   onChange={(e) => setTeacherId(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition-all"
@@ -144,14 +174,14 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Password
+                Password / PIN (पासवर्ड)
               </label>
               <div className="relative">
                 <input
                   id="teacher-password-input"
                   type={showPassword ? 'text' : 'password'}
                   required
-                  placeholder="Enter password (teacher123)"
+                  placeholder="123456"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-9 pr-10 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition-all"
@@ -198,7 +228,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
             </button>
             <div className="flex items-center gap-1 text-slate-400 text-[11px]">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Teacher Area</span>
+              <span>Faculty Only</span>
             </div>
           </div>
         </div>
@@ -217,6 +247,13 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Add Teacher Account Modal */}
+      <AddTeacherModal
+        isOpen={isAddTeacherOpen}
+        onClose={() => setIsAddTeacherOpen(false)}
+        onAccountCreated={handleAccountCreated}
+      />
     </div>
   );
 };

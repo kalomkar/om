@@ -15,6 +15,7 @@ import {
   fetchAllRequestsFromFirestore 
 } from './lib/requestsService';
 import { testConnection } from './lib/firebase';
+import { clearActiveTeacherSession, getActiveTeacherSession } from './lib/teacherService';
 
 const INITIAL_SEED_DATA: StudentRequest[] = [
   {
@@ -307,12 +308,14 @@ export default function App() {
     setIsTeacherLoggedIn(true);
     localStorage.setItem('teacher_logged_in', 'true');
     setPortal('teacher');
-    showToast('👨‍🏫 Welcome, Teacher! Successfully logged in.');
+    const session = getActiveTeacherSession();
+    showToast(`👨‍🏫 Welcome, ${session?.name || 'Teacher'}! Successfully logged in.`);
   };
 
   // Teacher Logout handler
   const handleTeacherLogout = () => {
     setIsTeacherLoggedIn(false);
+    clearActiveTeacherSession();
     localStorage.removeItem('teacher_logged_in');
     setPortal('student');
     showToast('Logged out successfully.');

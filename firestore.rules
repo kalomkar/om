@@ -25,6 +25,11 @@ service cloud.firestore {
       allow delete: if true;
     }
 
+    match /teachers/{teacherId} {
+      // Allow reading and creating/updating teacher accounts
+      allow read, write: if true;
+    }
+
     // Connection testing doc
     match /test/{docId} {
       allow read, write: if true;

@@ -22,12 +22,30 @@
         "updatedAt": { "type": "string", "description": "ISO timestamp of last update" }
       },
       "required": ["id", "studentName", "rollNumber", "category", "title", "description", "status", "createdAt"]
+    },
+    "TeacherAccount": {
+      "title": "TeacherAccount",
+      "description": "Authorized teacher account credentials and profile",
+      "type": "object",
+      "properties": {
+        "teacherId": { "type": "string", "description": "Teacher unique identifier e.g. 9771" },
+        "name": { "type": "string", "description": "Full name of teacher" },
+        "password": { "type": "string", "description": "Password or PIN" },
+        "department": { "type": "string", "description": "Department or subject" },
+        "role": { "type": "string", "description": "Role e.g. teacher or admin" },
+        "createdAt": { "type": "string", "description": "Timestamp created" }
+      },
+      "required": ["teacherId", "name", "password"]
     }
   },
   "firestore": {
     "/requests/{requestId}": {
       "schema": "StudentRequest",
       "description": "Global collection of all student requests shared across student and teacher devices"
+    },
+    "/teachers/{teacherId}": {
+      "schema": "TeacherAccount",
+      "description": "Registered teacher accounts able to login on any device"
     }
   }
 }

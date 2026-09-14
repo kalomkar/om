@@ -52,3 +52,12 @@ export interface DashboardStats {
   rejected: number;
   resolved: number;
 }
+
+export interface TeacherAccount {
+  teacherId: string; // e.g. "9771"
+  name: string;
+  password: string; // e.g. "123456"
+  department?: string;
+  role?: 'teacher' | 'admin' | 'hod';
+  createdAt: string;
+}

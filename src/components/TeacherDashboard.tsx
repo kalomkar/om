@@ -23,11 +23,13 @@ import {
   QrCode,
   Calendar,
   AlertCircle,
-  Database
+  Database,
+  UserPlus
 } from 'lucide-react';
 import { StudentRequest, RequestStatus } from '../types';
 import { CATEGORIES, STATUS_CONFIG, URGENCY_CONFIG } from '../utils/categories';
 import { DatabaseModal } from './DatabaseModal';
+import { AddTeacherModal } from './AddTeacherModal';
 import { createTeacherStatusUpdateWhatsAppUrl } from '../utils/whatsapp';
 
 interface TeacherDashboardProps {
@@ -58,6 +60,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [isDbModalOpen, setIsDbModalOpen] = useState(false);
+  const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
 
   const studentShareUrl = portalUrl.includes('?') 
     ? `${portalUrl}&mode=student` 
@@ -328,6 +331,16 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             >
               <Database className="w-3.5 h-3.5 text-blue-200" />
               <span>View Database (डेटाबेस देखें)</span>
+            </button>
+
+            <button
+              id="open-add-teacher-btn"
+              onClick={() => setIsAddTeacherOpen(true)}
+              title="Add or manage authorized teacher accounts"
+              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 shrink-0"
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              <span>+ Add Teacher (शिक्षक जोड़ें)</span>
             </button>
 
             <button
@@ -694,6 +707,12 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
         onClose={() => setIsDbModalOpen(false)}
         portalUrl={portalUrl}
         onRefreshAll={onRefresh}
+      />
+
+      {/* Add Teacher Account Modal */}
+      <AddTeacherModal
+        isOpen={isAddTeacherOpen}
+        onClose={() => setIsAddTeacherOpen(false)}
       />
     </div>
   );
