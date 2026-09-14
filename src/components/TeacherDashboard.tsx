@@ -30,6 +30,7 @@ import { StudentRequest, RequestStatus } from '../types';
 import { CATEGORIES, STATUS_CONFIG, URGENCY_CONFIG } from '../utils/categories';
 import { DatabaseModal } from './DatabaseModal';
 import { AddTeacherModal } from './AddTeacherModal';
+import { ProjectReportModal } from './ProjectReportModal';
 import { createTeacherStatusUpdateWhatsAppUrl } from '../utils/whatsapp';
 
 interface TeacherDashboardProps {
@@ -61,6 +62,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   const [copiedLink, setCopiedLink] = useState(false);
   const [isDbModalOpen, setIsDbModalOpen] = useState(false);
   const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
   const studentShareUrl = portalUrl.includes('?') 
     ? `${portalUrl}&mode=student` 
@@ -331,6 +333,16 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             >
               <Database className="w-3.5 h-3.5 text-blue-200" />
               <span>View Database (डेटाबेस देखें)</span>
+            </button>
+
+            <button
+              id="open-project-report-btn"
+              onClick={() => setIsReportModalOpen(true)}
+              title="Open Complete Project Workflow, Architecture & Technical Report"
+              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 shrink-0"
+            >
+              <FileText className="w-3.5 h-3.5 text-blue-300" />
+              <span>Project Report (प्रोजेक्ट रिपोर्ट)</span>
             </button>
 
             <button
@@ -713,6 +725,12 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
       <AddTeacherModal
         isOpen={isAddTeacherOpen}
         onClose={() => setIsAddTeacherOpen(false)}
+      />
+
+      {/* Project Technical Report & Workflow Documentation Modal */}
+      <ProjectReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
       />
     </div>
   );

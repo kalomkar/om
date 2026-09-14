@@ -6,6 +6,7 @@ import { TeacherLogin } from './components/TeacherLogin';
 import { RequestTracker } from './components/RequestTracker';
 import { SubmissionSuccessModal } from './components/SubmissionSuccessModal';
 import { ShareModal } from './components/ShareModal';
+import { ProjectReportModal } from './components/ProjectReportModal';
 import { StudentRequest, RequestStatus } from './types';
 import { 
   subscribeToRequests, 
@@ -118,6 +119,7 @@ export default function App() {
   const [autoOpenWhatsApp, setAutoOpenWhatsApp] = useState<boolean>(true);
   const [trackingId, setTrackingId] = useState<string>('');
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>('');
 
   const portalUrl = typeof window !== 'undefined' ? window.location.origin : '';
@@ -415,18 +417,36 @@ export default function App() {
       {/* Discreet Minimal Footer */}
       <footer className="py-4 text-center text-xs text-slate-400 border-t border-slate-200/60 mt-auto">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© {new Date().getFullYear()} Student Request Desk • All submissions are encrypted and securely stored</p>
-          {portal === 'student' && (
+          <p>© {new Date().getFullYear()} SRN Mehta College Kalburgi • Student Requirement Desk</p>
+          <div className="flex items-center gap-3">
             <button
-              id="footer-staff-access-btn"
-              onClick={() => setPortal('teacher')}
-              className="text-slate-400 hover:text-slate-600 text-[11px] transition-colors"
+              id="footer-project-docs-btn"
+              onClick={() => setIsReportModalOpen(true)}
+              className="text-blue-600 hover:text-blue-700 hover:underline text-[11px] font-medium transition-colors"
             >
-              Faculty / Staff Access
+              📖 System Workflow & Report
             </button>
-          )}
+            {portal === 'student' && (
+              <>
+                <span>•</span>
+                <button
+                  id="footer-staff-access-btn"
+                  onClick={() => setPortal('teacher')}
+                  className="text-slate-400 hover:text-slate-600 text-[11px] transition-colors"
+                >
+                  Faculty Access
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </footer>
+
+      {/* Global Project Report & Architecture Modal */}
+      <ProjectReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+      />
     </div>
   );
 }
