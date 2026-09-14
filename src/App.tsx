@@ -7,6 +7,14 @@ import { RequestTracker } from './components/RequestTracker';
 import { SubmissionSuccessModal } from './components/SubmissionSuccessModal';
 import { ShareModal } from './components/ShareModal';
 import { StudentRequest, RequestStatus } from './types';
+import { 
+  subscribeToRequests, 
+  updateRequestInFirestore, 
+  deleteRequestFromFirestore, 
+  saveRequestToFirestore,
+  fetchAllRequestsFromFirestore 
+} from './lib/requestsService';
+import { testConnection } from './lib/firebase';
 
 const INITIAL_SEED_DATA: StudentRequest[] = [
   {
@@ -106,6 +114,7 @@ export default function App() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [submittedRequest, setSubmittedRequest] = useState<StudentRequest | null>(null);
+  const [autoOpenWhatsApp, setAutoOpenWhatsApp] = useState<boolean>(true);
   const [trackingId, setTrackingId] = useState<string>('');
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>('');
@@ -172,15 +181,52 @@ export default function App() {
     }
   }, []);
 
+  // Test Firestore connection on boot
   useEffect(() => {
+    testConnection();
+  }, []);
+
+  // Realtime Cloud Synchronization with Firestore + Local Fallback
+  useEffect(() => {
+    // 1. Subscribe to Firestore Realtime Updates (instant cross-device sync)
+    const unsubscribe = subscribeToRequests((firestoreItems) => {
+      if (Array.isArray(firestoreItems) && firestoreItems.length > 0) {
+        setRequests((prev) => {
+          // Merge preserving any pending items
+          const map = new Map<string, StudentRequest>();
+          firestoreItems.forEach((it) => map.set(it.id, it));
+          prev.forEach((it) => {
+            if (!map.has(it.id)) map.set(it.id, it);
+          });
+          const merged = Array.from(map.values()).sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+          try {
+            localStorage.setItem('student_requests_cache', JSON.stringify(merged));
+          } catch {}
+          return merged;
+        });
+        setIsLoading(false);
+      }
+    });
+
+    // 2. Also fetch from express server/fallback on initial load
     fetchRequests();
-    // Periodic refresh every 20s to catch new submissions
-    const interval = setInterval(fetchRequests, 20000);
-    return () => clearInterval(interval);
+
+    // 3. Periodic poll as backup
+    const interval = setInterval(() => {
+      fetchRequests();
+    }, 10000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
   }, [fetchRequests]);
 
   // Handle successful student submission
-  const handleSubmissionSuccess = (newRequest: StudentRequest) => {
+  const handleSubmissionSuccess = (newRequest: StudentRequest, openWhatsApp: boolean = true) => {
+    setAutoOpenWhatsApp(openWhatsApp);
     setRequests(prev => {
       const updated = [newRequest, ...prev.filter(r => r.id !== newRequest.id)];
       try {
@@ -189,7 +235,9 @@ export default function App() {
       return updated;
     });
     setSubmittedRequest(newRequest);
-    showToast(`🎉 Success! Request #${newRequest.id} saved.`);
+    showToast(`🎉 Success! Request #${newRequest.id} saved in database.`);
+    // Immediate sync with backend database
+    setTimeout(() => fetchRequests(), 500);
   };
 
   // Handle status update by teacher
@@ -202,6 +250,13 @@ export default function App() {
       } catch {}
       return next;
     });
+
+    // 1. Sync to Google Cloud Firestore
+    try {
+      await updateRequestInFirestore(id, { status, teacherRemarks: remarks });
+    } catch (fsErr) {
+      console.warn('Firestore update sync note:', fsErr);
+    }
 
     try {
       const res = await fetch(`/api/requests/${id}`, {
@@ -239,6 +294,7 @@ export default function App() {
     });
 
     try {
+      await deleteRequestFromFirestore(id);
       await fetch(`/api/requests/${id}`, { method: 'DELETE' });
       showToast(`Request ${id} deleted.`);
     } catch {
@@ -341,6 +397,8 @@ export default function App() {
           request={submittedRequest}
           onClose={() => setSubmittedRequest(null)}
           onTrack={handleTrackDirectly}
+          portalUrl={portalUrl}
+          autoOpenWhatsApp={autoOpenWhatsApp}
         />
       )}
 

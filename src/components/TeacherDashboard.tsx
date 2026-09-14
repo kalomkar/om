@@ -22,10 +22,13 @@ import {
   MessageCircle,
   QrCode,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  Database
 } from 'lucide-react';
 import { StudentRequest, RequestStatus } from '../types';
 import { CATEGORIES, STATUS_CONFIG, URGENCY_CONFIG } from '../utils/categories';
+import { DatabaseModal } from './DatabaseModal';
+import { createTeacherStatusUpdateWhatsAppUrl } from '../utils/whatsapp';
 
 interface TeacherDashboardProps {
   requests: StudentRequest[];
@@ -54,6 +57,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   const [modalStatus, setModalStatus] = useState<RequestStatus>('pending');
   const [isSaving, setIsSaving] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [isDbModalOpen, setIsDbModalOpen] = useState(false);
 
   const studentShareUrl = portalUrl.includes('?') 
     ? `${portalUrl}&mode=student` 
@@ -317,6 +321,16 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             </select>
 
             <button
+              id="open-database-explorer-btn"
+              onClick={() => setIsDbModalOpen(true)}
+              title="Inspect live database, raw JSON file, and API endpoints"
+              className="px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 shrink-0"
+            >
+              <Database className="w-3.5 h-3.5 text-blue-200" />
+              <span>View Database (डेटाबेस देखें)</span>
+            </button>
+
+            <button
               id="export-csv-btn"
               onClick={handleExportCSV}
               title="Download CSV report"
@@ -498,14 +512,14 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                     )}
                     {req.phone && (
                       <a
-                        href={`https://wa.me/${req.phone.replace(/[^0-9]/g, '')}`}
+                        href={createTeacherStatusUpdateWhatsAppUrl(req, req.status, req.teacherRemarks, portalUrl)}
                         target="_blank"
                         rel="noreferrer"
                         className="flex items-center gap-1 text-emerald-600 hover:text-emerald-700 font-medium transition-colors"
-                        title="Chat on WhatsApp"
+                        title="Send status update to student on WhatsApp"
                       >
                         <MessageCircle className="w-3.5 h-3.5" />
-                        <span>WhatsApp</span>
+                        <span>WhatsApp Student</span>
                       </a>
                     )}
                     {req.email && (
@@ -627,20 +641,34 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setSelectedRequest(null)}
-                  className="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveModal}
-                  disabled={isSaving}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-all shadow-xs flex items-center gap-1.5"
-                >
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 flex-wrap">
+                {selectedRequest.phone ? (
+                  <a
+                    href={createTeacherStatusUpdateWhatsAppUrl(selectedRequest, modalStatus, modalRemarks, portalUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs"
+                    title="Send updated status directly to student on WhatsApp"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Send WhatsApp Update</span>
+                  </a>
+                ) : <div />}
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedRequest(null)}
+                    className="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-xl transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveModal}
+                    disabled={isSaving}
+                    className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition-all shadow-xs flex items-center gap-1.5"
+                  >
                   {isSaving ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -657,7 +685,16 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             </div>
           </div>
         </div>
+      </div>
       )}
+
+      {/* Database Explorer Modal */}
+      <DatabaseModal
+        isOpen={isDbModalOpen}
+        onClose={() => setIsDbModalOpen(false)}
+        portalUrl={portalUrl}
+        onRefreshAll={onRefresh}
+      />
     </div>
   );
 };

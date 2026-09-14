@@ -9,13 +9,15 @@ import {
   Sparkles,
   Clock,
   ShieldCheck,
-  FileText
+  FileText,
+  MessageCircle
 } from 'lucide-react';
 import { RequestCategory, RequestUrgency, StudentRequest, AttachedDocument } from '../types';
 import { URGENCY_CONFIG } from '../utils/categories';
+import { saveRequestToFirestore } from '../lib/requestsService';
 
 interface StudentFormProps {
-  onSuccess: (request: StudentRequest) => void;
+  onSuccess: (request: StudentRequest, openWhatsApp?: boolean) => void;
 }
 
 export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
@@ -24,6 +26,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
   const [className, setClassName] = useState('B.Tech CS 3rd Year');
   const [section, setSection] = useState('Section A');
   const [phone, setPhone] = useState('');
+  const [notifyOnWhatsApp, setNotifyOnWhatsApp] = useState(true);
   const [email, setEmail] = useState('');
   const [category] = useState<RequestCategory>('document');
   const [title, setTitle] = useState('');
@@ -177,7 +180,14 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
         };
       }
 
-      onSuccess(submittedItem);
+      // Sync to Google Cloud Firestore immediately so all devices see it in real-time
+      try {
+        await saveRequestToFirestore(submittedItem);
+      } catch (firestoreErr) {
+        console.warn('Firestore sync note:', firestoreErr);
+      }
+
+      onSuccess(submittedItem, notifyOnWhatsApp);
     } catch (err: any) {
       setErrorMessage(err.message || 'Error submitting request. Please try again.');
     } finally {
@@ -312,6 +322,24 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full px-3 py-2 text-sm bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition-all"
               />
+              
+              <div className="mt-2 space-y-1.5">
+                <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/70">
+                  <MessageCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span><b>WhatsApp ऑटो-मैसेज:</b> फॉर्म सबमिट होते ही इस नंबर पर रसीद भेजी जाएगी</span>
+                </div>
+                
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-600 select-none pt-0.5">
+                  <input
+                    type="checkbox"
+                    id="whatsapp-auto-send-checkbox"
+                    checked={notifyOnWhatsApp}
+                    onChange={(e) => setNotifyOnWhatsApp(e.target.checked)}
+                    className="w-3.5 h-3.5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
+                  />
+                  <span>सबमिट करते ही व्हाट्सएप पर तुरंत रसीद खोलें</span>
+                </label>
+              </div>
             </div>
 
             <div>

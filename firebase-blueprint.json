@@ -1,0 +1,33 @@
+{
+  "entities": {
+    "StudentRequest": {
+      "title": "StudentRequest",
+      "description": "Student requirement or document submission request",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique request reference number e.g. REQ-12345" },
+        "studentName": { "type": "string", "description": "Full name of the student" },
+        "rollNumber": { "type": "string", "description": "Student roll / registration number" },
+        "className": { "type": "string", "description": "Class or department" },
+        "section": { "type": "string", "description": "Section" },
+        "phone": { "type": "string", "description": "Contact or WhatsApp number" },
+        "email": { "type": "string", "description": "Student email address" },
+        "category": { "type": "string", "description": "Request category" },
+        "title": { "type": "string", "description": "Subject or title of request" },
+        "description": { "type": "string", "description": "Detailed explanation" },
+        "urgency": { "type": "string", "description": "Urgency level" },
+        "status": { "type": "string", "description": "Current status" },
+        "teacherRemarks": { "type": "string", "description": "Notes from reviewing teacher" },
+        "createdAt": { "type": "string", "description": "ISO timestamp of creation" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp of last update" }
+      },
+      "required": ["id", "studentName", "rollNumber", "category", "title", "description", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/requests/{requestId}": {
+      "schema": "StudentRequest",
+      "description": "Global collection of all student requests shared across student and teacher devices"
+    }
+  }
+}

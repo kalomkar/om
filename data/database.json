@@ -1,0 +1,75 @@
+[
+  {
+    "id": "REQ-10482",
+    "studentName": "Aarav Sharma",
+    "rollNumber": "CS-2024-42",
+    "className": "B.Tech CS 3rd Year",
+    "section": "Section B",
+    "phone": "+91 98765 43210",
+    "email": "aarav.sharma@college.edu",
+    "category": "certificate",
+    "title": "Bonafide Certificate for National Scholarship Application",
+    "description": "Sir, I need a Bonafide Certificate with college stamp to apply for the State Merit Scholarship. The last date of submission is next Monday.",
+    "urgency": "high",
+    "status": "pending",
+    "createdAt": "2026-09-14T10:42:08.991Z",
+    "updatedAt": "2026-09-14T10:42:08.992Z",
+    "notificationSent": true,
+    "notificationDetails": {
+      "smsSent": true,
+      "emailSent": true,
+      "sentAt": "2026-09-14T10:42:08.992Z"
+    }
+  },
+  {
+    "id": "REQ-10481",
+    "studentName": "Priya Verma",
+    "rollNumber": "CS-2024-18",
+    "className": "B.Tech CS 3rd Year",
+    "section": "Section A",
+    "phone": "+91 98123 45678",
+    "email": "priya.verma@college.edu",
+    "category": "leave",
+    "title": "Medical Leave Application (3 Days)",
+    "description": "Respected Teacher, I am down with viral fever. Requesting permission for leave from 10th to 12th. Medical prescription is attached.",
+    "urgency": "urgent",
+    "attachedFile": {
+      "name": "medical_certificate_prescription.pdf",
+      "size": 145200,
+      "type": "application/pdf"
+    },
+    "status": "in_review",
+    "teacherRemarks": "Prescription noted. Get well soon and submit lab assignments upon return.",
+    "createdAt": "2026-09-13T18:42:08.992Z",
+    "updatedAt": "2026-09-14T04:42:08.992Z",
+    "notificationSent": true,
+    "notificationDetails": {
+      "smsSent": true,
+      "emailSent": true,
+      "sentAt": "2026-09-13T18:42:08.992Z"
+    }
+  },
+  {
+    "id": "REQ-10479",
+    "studentName": "Rahul Patel",
+    "rollNumber": "CS-2024-55",
+    "className": "B.Tech CS 3rd Year",
+    "section": "Section B",
+    "phone": "+91 97234 56789",
+    "email": "rahul.patel@college.edu",
+    "category": "document",
+    "title": "Official 4th Semester Marksheet Duplicate Copy",
+    "description": "Sir, I have misplaced my hardcopy marksheet of 4th Semester and need a verified duplicate copy for internship verification.",
+    "urgency": "normal",
+    "status": "approved",
+    "teacherRemarks": "Verified and signed. You can collect the printed original from Admin Block Counter #3.",
+    "createdAt": "2026-09-12T14:42:08.992Z",
+    "updatedAt": "2026-09-13T20:42:08.992Z",
+    "notificationSent": true,
+    "notificationDetails": {
+      "smsSent": true,
+      "emailSent": true,
+      "sentAt": "2026-09-12T14:42:08.992Z"
+    }
+  }
+]

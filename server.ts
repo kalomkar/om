@@ -286,6 +286,80 @@ async function startServer() {
     res.json({ success: true, message: 'Request deleted' });
   });
 
+  // GET database info, statistics, and full document collection
+  app.get('/api/database', (req, res) => {
+    let stats = { size: 0, mtime: new Date().toISOString() };
+    if (fs.existsSync(DB_FILE)) {
+      try {
+        const s = fs.statSync(DB_FILE);
+        stats = { size: s.size, mtime: s.mtime.toISOString() };
+      } catch {}
+    }
+    res.json({
+      status: 'online',
+      storageEngine: 'Local Persistent JSON Document Store',
+      filePath: 'data/database.json',
+      fileSizeBytes: stats.size,
+      fileSizeKB: (stats.size / 1024).toFixed(2),
+      totalRecords: requestsDb.length,
+      lastModified: stats.mtime,
+      endpoints: {
+        allRequests: '/api/requests',
+        rawDatabase: '/api/database',
+        exportCsv: '/api/database/export?format=csv',
+        exportJson: '/api/database/export?format=json',
+      },
+      records: requestsDb,
+    });
+  });
+
+  // GET raw database file download or inspection
+  app.get('/api/database/raw', (req, res) => {
+    if (!fs.existsSync(DB_FILE)) {
+      saveDatabase(requestsDb);
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.sendFile(DB_FILE);
+  });
+
+  // GET database export as JSON or CSV file
+  app.get('/api/database/export', (req, res) => {
+    const format = req.query.format === 'csv' ? 'csv' : 'json';
+    if (format === 'json') {
+      res.setHeader('Content-Disposition', `attachment; filename="student_database_${new Date().toISOString().slice(0, 10)}.json"`);
+      res.setHeader('Content-Type', 'application/json');
+      return res.send(JSON.stringify(requestsDb, null, 2));
+    } else {
+      const headers = ['Tracking ID', 'Student Name', 'Roll Number', 'Class', 'Section', 'Category', 'Subject', 'Status', 'Urgency', 'Phone', 'Email', 'Remarks', 'Date'];
+      const rows = requestsDb.map(r => [
+        `"${r.id}"`,
+        `"${(r.studentName || '').replace(/"/g, '""')}"`,
+        `"${r.rollNumber}"`,
+        `"${r.className}"`,
+        `"${r.section || ''}"`,
+        `"${r.category}"`,
+        `"${(r.title || '').replace(/"/g, '""')}"`,
+        `"${r.status}"`,
+        `"${r.urgency}"`,
+        `"${r.phone || ''}"`,
+        `"${r.email || ''}"`,
+        `"${(r.teacherRemarks || '').replace(/"/g, '""')}"`,
+        `"${r.createdAt}"`
+      ]);
+      const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\r\n');
+      res.setHeader('Content-Disposition', `attachment; filename="student_database_${new Date().toISOString().slice(0, 10)}.csv"`);
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      return res.send(csv);
+    }
+  });
+
+  // POST reset or seed database
+  app.post('/api/database/reset-seed', (req, res) => {
+    requestsDb = initDatabase();
+    saveDatabase(requestsDb);
+    res.json({ success: true, message: 'Database reset to initial seed data', count: requestsDb.length });
+  });
+
   // Vite middleware for development vs static build in production
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

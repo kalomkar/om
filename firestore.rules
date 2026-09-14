@@ -1,0 +1,33 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function
+    function isValidRequest(data) {
+      return data.id is string
+        && data.studentName is string && data.studentName.size() > 0 && data.studentName.size() <= 200
+        && data.rollNumber is string && data.rollNumber.size() > 0 && data.rollNumber.size() <= 100
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 300
+        && data.description is string && data.description.size() <= 5000
+        && data.status in ['pending', 'in_review', 'approved', 'resolved', 'rejected'];
+    }
+
+    match /requests/{requestId} {
+      // Anyone (student or teacher) can read requests to track status or view dashboard
+      allow read: if true;
+
+      // Anyone (students submitting without auth) can create valid student requests
+      allow create: if isValidRequest(request.resource.data);
+
+      // Anyone (teachers reviewing) can update status and remarks
+      allow update: if isValidRequest(request.resource.data);
+
+      // Teachers or admin can delete
+      allow delete: if true;
+    }
+
+    // Connection testing doc
+    match /test/{docId} {
+      allow read, write: if true;
+    }
+  }
+}

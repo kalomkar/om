@@ -1,20 +1,41 @@
-import React, { useState } from 'react';
-import { CheckCircle2, Copy, Check, Printer, ArrowRight, BellRing, Smartphone, Mail, FileText } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { CheckCircle2, Copy, Check, Printer, ArrowRight, BellRing, Smartphone, Mail, FileText, MessageCircle, ExternalLink } from 'lucide-react';
 import { StudentRequest } from '../types';
 import { CATEGORIES } from '../utils/categories';
+import { createStudentReceiptWhatsAppUrl } from '../utils/whatsapp';
 
 interface SubmissionSuccessModalProps {
   request: StudentRequest;
   onClose: () => void;
   onTrack: (id: string) => void;
+  portalUrl?: string;
+  autoOpenWhatsApp?: boolean;
 }
 
 export const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
   request,
   onClose,
   onTrack,
+  portalUrl,
+  autoOpenWhatsApp = true,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [copiedMsg, setCopiedMsg] = useState(false);
+
+  const siteUrl = portalUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+  const whatsAppUrl = createStudentReceiptWhatsAppUrl(request, siteUrl);
+
+  // Auto-launch WhatsApp if requested
+  useEffect(() => {
+    if (autoOpenWhatsApp && request.phone) {
+      const timer = setTimeout(() => {
+        try {
+          window.open(whatsAppUrl, '_blank');
+        } catch {}
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [autoOpenWhatsApp, request.phone, whatsAppUrl]);
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(request.id);
@@ -196,6 +217,58 @@ export const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
               </div>
             )}
           </div>
+
+          {/* WhatsApp Direct Action Box */}
+          {request.phone && (
+            <div className="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3.5 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+                    <MessageCircle className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-emerald-950">WhatsApp Confirmation Slip</h4>
+                    <p className="text-[11px] text-emerald-700">व्हाट्सएप पर आधिकारिक रसीद व ट्रैकिंग लिंक</p>
+                  </div>
+                </div>
+                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full border border-emerald-200">
+                  Ready
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                <a
+                  id="open-whatsapp-receipt-btn"
+                  href={whatsAppUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition-all active:scale-98"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>Open WhatsApp</span>
+                  <ExternalLink className="w-3 h-3 text-emerald-200" />
+                </a>
+
+                <button
+                  id="copy-whatsapp-text-btn"
+                  type="button"
+                  onClick={() => {
+                    const messageText = decodeURIComponent(whatsAppUrl.split('text=')[1] || '');
+                    navigator.clipboard.writeText(messageText);
+                    setCopiedMsg(true);
+                    setTimeout(() => setCopiedMsg(false), 2000);
+                  }}
+                  className="w-full py-2.5 px-3 bg-white hover:bg-emerald-100/50 text-emerald-800 border border-emerald-300 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all"
+                >
+                  {copiedMsg ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedMsg ? 'Message Copied!' : 'Copy WhatsApp Text'}</span>
+                </button>
+              </div>
+              <p className="text-[10px] text-emerald-600 text-center">
+                यदि व्हाट्सएप अपने आप नहीं खुला तो ऊपर "Open WhatsApp" बटन दबाएं।
+              </p>
+            </div>
+          )}
 
           {/* Action Buttons */}
           <div className="space-y-2 pt-1">
