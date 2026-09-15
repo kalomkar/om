@@ -7,6 +7,8 @@ import { RequestTracker } from './components/RequestTracker';
 import { SubmissionSuccessModal } from './components/SubmissionSuccessModal';
 import { ShareModal } from './components/ShareModal';
 import { ProjectReportModal } from './components/ProjectReportModal';
+import { GeminiChatModal } from './components/GeminiChatModal';
+import { Sparkles } from 'lucide-react';
 import { StudentRequest, RequestStatus } from './types';
 import { 
   subscribeToRequests, 
@@ -164,9 +166,21 @@ export default function App() {
   const [trackingId, setTrackingId] = useState<string>('');
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
+  const [isAiModalOpen, setIsAiModalOpen] = useState<boolean>(false);
+  const [aiRole, setAiRole] = useState<'faculty_copilot' | 'letter_drafter' | 'doubt_solver' | 'student_guide'>('faculty_copilot');
+  const [aiPrompt, setAiPrompt] = useState<string>('');
   const [toastMessage, setToastMessage] = useState<string>('');
 
   const portalUrl = typeof window !== 'undefined' ? window.location.origin : '';
+
+  const handleOpenAiModal = (
+    role: 'faculty_copilot' | 'letter_drafter' | 'doubt_solver' | 'student_guide' = 'faculty_copilot',
+    prompt: string = ''
+  ) => {
+    setAiRole(role);
+    setAiPrompt(prompt);
+    setIsAiModalOpen(true);
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -397,6 +411,7 @@ export default function App() {
           setPortal('student');
           setStudentView('form');
         }}
+        onOpenAiModal={() => handleOpenAiModal(portal === 'teacher' ? 'faculty_copilot' : 'student_guide')}
         pendingCount={pendingCount}
       />
 
@@ -412,7 +427,10 @@ export default function App() {
         {portal === 'student' ? (
           /* Student Portal Views */
           studentView === 'form' ? (
-            <StudentForm onSuccess={handleSubmissionSuccess} />
+            <StudentForm
+              onSuccess={handleSubmissionSuccess}
+              onOpenAiAssistant={handleOpenAiModal}
+            />
           ) : (
             <RequestTracker initialTrackingId={trackingId} />
           )
@@ -434,6 +452,7 @@ export default function App() {
               onUpdateRequest={handleUpdateRequest}
               onDeleteRequest={handleDeleteRequest}
               onOpenShareModal={() => setIsShareModalOpen(true)}
+              onOpenAiAssistant={handleOpenAiModal}
               portalUrl={portalUrl}
             />
           )
@@ -490,6 +509,33 @@ export default function App() {
       <ProjectReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
+      />
+
+      {/* Floating Action Button for Instant Gemini AI Copilot */}
+      <button
+        id="floating-ai-copilot-btn"
+        onClick={() => handleOpenAiModal(portal === 'teacher' ? 'faculty_copilot' : 'student_guide')}
+        className="fixed bottom-5 right-5 z-40 px-4 py-3 bg-gradient-to-r from-amber-500 via-indigo-600 to-blue-600 hover:from-amber-600 hover:via-indigo-700 hover:to-blue-700 text-white rounded-full shadow-xl hover:shadow-2xl border border-white/20 flex items-center gap-2 transition-all active:scale-95 group cursor-pointer"
+        title="Ask Gemini Academic AI Copilot"
+      >
+        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+          <Sparkles className="w-4 h-4 text-amber-200 group-hover:rotate-12 transition-transform" />
+        </div>
+        <span className="text-xs font-bold tracking-tight pr-1">
+          Ask Gemini AI
+        </span>
+      </button>
+
+      {/* Gemini AI Multi-Turn Academic Chatbot Modal */}
+      <GeminiChatModal
+        isOpen={isAiModalOpen}
+        onClose={() => {
+          setIsAiModalOpen(false);
+          setAiPrompt('');
+        }}
+        requests={requests}
+        initialRole={aiRole}
+        initialPrompt={aiPrompt}
       />
     </div>
   );

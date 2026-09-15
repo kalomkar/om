@@ -2,6 +2,26 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
+import { GoogleGenAI } from '@google/genai';
+
+let geminiClient: GoogleGenAI | null = null;
+function getGeminiClient(): GoogleGenAI {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error('GEMINI_API_KEY environment variable is not configured in Settings > Secrets.');
+  }
+  if (!geminiClient) {
+    geminiClient = new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
+      },
+    });
+  }
+  return geminiClient;
+}
 
 interface StudentRequestItem {
   id: string;
@@ -221,6 +241,93 @@ async function startServer() {
   // API Routes
   app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString(), count: requestsDb.length });
+  });
+
+  // POST /api/gemini/chat - Multi-turn Academic & Faculty Copilot Chat Interface
+  app.post('/api/gemini/chat', async (req, res) => {
+    try {
+      const { messages, role, model, contextData } = req.body;
+
+      if (!Array.isArray(messages) || messages.length === 0) {
+        return res.status(400).json({ error: 'Messages array is required and cannot be empty.' });
+      }
+
+      const ai = getGeminiClient();
+
+      const roleInstructions: Record<string, string> = {
+        faculty_copilot: `You are the Senior Academic Dean & Faculty Copilot for an Indian Higher Education Institution (e.g. Engineering, BCA, B.Sc, Commerce).
+Your role is to assist teachers and HODs in:
+1. Analyzing student survey requirements and skill assessments (Programming, Excel, Google Docs, Report Writing, English Communication).
+2. Generating structured remedial class timetables, doubt clearing schedules, and intervention plans.
+3. Formulating student-centric academic policies and mentorship advice.
+Always be structured, actionable, and practical. Format with clear headings, bullet points, and tables where helpful. You can understand and respond in English or Hindi/Hinglish as requested.`,
+
+        letter_drafter: `You are an expert Educational Administrative Officer & Letter Drafter for a college.
+Your role is to generate formal, stamped college administrative documents, including:
+1. Official Bonafide / Study Certificates.
+2. Medical Leave Approval / Acknowledgement Letters.
+3. Character & Conduct Certificates, NOCs for internships.
+4. Class announcements for WhatsApp groups, circulars for the college notice board, and SMS notification drafts.
+5. Official teacher remarks for student portal requests.
+Ensure the tone is formal, polite, precise, and includes placeholders like [Date], [Reference No.], [Principal / HOD Signature] where appropriate.`,
+
+        doubt_solver: `You are an expert, friendly College Professor and Subject Tutor.
+Your role is to help college students master challenging academic subjects:
+1. Computer Programming (Python, C, C++, Java, Web Development, Data Structures).
+2. Data & Office Tools (Excel formulas like VLOOKUP, INDEX-MATCH, Pivot Tables, Google Sheets).
+3. Academic Report Writing (Format, Abstract, Methodology, IEEE style citations).
+4. Placement & Interview Preparation (Technical interview questions, aptitude tips, HR mock answers).
+Provide clear step-by-step explanations with easy-to-understand real-world code snippets or examples.`,
+
+        student_guide: `You are a friendly, supportive College Student Mentor and Application Counselor.
+Your role is to guide students in:
+1. Drafting polite, professional application letters to the Principal, HOD, or Class Teacher for leaves, fee concessions, duplicate certificates, or extra doubt sessions.
+2. Explaining how to present their academic requirements effectively.
+3. Offering study tips, time-management guidance, and career advice for examinations.
+Speak kindly, encouragingly, and clearly.`
+      };
+
+      const selectedRole = (role && roleInstructions[role]) ? role : 'faculty_copilot';
+      let systemInstruction = roleInstructions[selectedRole];
+
+      if (contextData) {
+        systemInstruction += `\n\n[PORTAL LIVE DATABASE CONTEXT - Current Student Records & Skill Stats]:\n${typeof contextData === 'string' ? contextData : JSON.stringify(contextData, null, 2)}\nUse this real data when answering questions about the students, classes, or requests.`;
+      }
+
+      // Supported models: gemini-3.8-flash (default), gemini-3.5-flash, gemini-3.1-flash-lite, gemini-3.1-pro-preview
+      const validModels = ['gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.1-pro-preview'];
+      const chosenModel = validModels.includes(model) ? model : 'gemini-3.8-flash';
+
+      // Format conversation history for generateContent
+      const contents = messages.map((m: any) => ({
+        role: m.role === 'model' || m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: String(m.text || m.content || '') }],
+      }));
+
+      const response = await ai.models.generateContent({
+        model: chosenModel,
+        contents,
+        config: {
+          systemInstruction,
+          temperature: 0.7,
+        },
+      });
+
+      const reply = response.text || 'I apologize, but I could not formulate a response. Please try rephrasing.';
+
+      res.json({
+        success: true,
+        model: chosenModel,
+        role: selectedRole,
+        reply,
+      });
+    } catch (err: any) {
+      console.error('Gemini chat endpoint error:', err);
+      res.status(500).json({
+        error: 'Failed to generate AI response',
+        details: err?.message || 'Unknown error occurred with Gemini API',
+      });
+    }
   });
 
   // GET all requests

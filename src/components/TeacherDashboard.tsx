@@ -30,7 +30,8 @@ import {
   BookOpen,
   Code2,
   BarChart3,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Sparkles
 } from 'lucide-react';
 import { StudentRequest, RequestStatus } from '../types';
 import { CATEGORIES, STATUS_CONFIG, URGENCY_CONFIG } from '../utils/categories';
@@ -48,6 +49,7 @@ interface TeacherDashboardProps {
   onUpdateRequest: (id: string, status: RequestStatus, remarks?: string) => Promise<void>;
   onDeleteRequest: (id: string) => Promise<void>;
   onOpenShareModal: () => void;
+  onOpenAiAssistant?: (role?: 'faculty_copilot' | 'letter_drafter' | 'doubt_solver' | 'student_guide', prompt?: string) => void;
   portalUrl: string;
 }
 
@@ -58,6 +60,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   onUpdateRequest,
   onDeleteRequest,
   onOpenShareModal,
+  onOpenAiAssistant,
   portalUrl,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -471,6 +474,16 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             </select>
 
             <button
+              id="open-ai-assistant-toolbar-btn"
+              onClick={() => onOpenAiAssistant && onOpenAiAssistant('faculty_copilot')}
+              title="Open Gemini Academic AI Assistant & Class Copilot"
+              className="px-3.5 py-2 bg-gradient-to-r from-amber-500 via-indigo-600 to-blue-600 hover:from-amber-600 hover:via-indigo-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 shrink-0 cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
+              <span>AI Copilot</span>
+            </button>
+
+            <button
               id="open-auto-analysis-btn"
               onClick={() => setIsAnalyticsModalOpen(true)}
               title="View automated analysis of skills and requirements"
@@ -844,6 +857,20 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                         Approve
                       </button>
                     )}
+
+                    <button
+                      onClick={() => {
+                        if (onOpenAiAssistant) {
+                          const prompt = `Student ${req.studentName} (Roll: ${req.rollNumber}, Class: ${req.className}) ne "${req.title}" (Category: ${req.category}) request submit kiya hai.\nDescription: "${req.description}"\nProgramming Skill: ${req.skillRatings?.programming || 'Not specified'}\nAcademic Requirements: ${req.academicRequirements?.join(', ') || 'None'}\n\nIs student ke liye formal verification remark aur recommendation draft karo.`;
+                          onOpenAiAssistant('faculty_copilot', prompt);
+                        }
+                      }}
+                      title="Ask Gemini AI for advice or draft remarks for this student"
+                      className="px-2.5 py-1.5 bg-gradient-to-r from-amber-50 to-indigo-50 hover:from-amber-100 hover:to-indigo-100 text-indigo-900 border border-indigo-200/80 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Ask AI</span>
+                    </button>
 
                     <button
                       onClick={() => handleOpenReviewModal(req)}

@@ -29,9 +29,10 @@ import { saveRequestToFirestore } from '../lib/requestsService';
 
 interface StudentFormProps {
   onSuccess: (request: StudentRequest, openWhatsApp?: boolean) => void;
+  onOpenAiAssistant?: (role?: 'faculty_copilot' | 'letter_drafter' | 'doubt_solver' | 'student_guide', prompt?: string) => void;
 }
 
-export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
+export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess, onOpenAiAssistant }) => {
   const [studentName, setStudentName] = useState('');
   const [rollNumber, setRollNumber] = useState('');
   const [className, setClassName] = useState('B.Tech CS 3rd Year');
@@ -720,9 +721,25 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
 
           {/* Detailed Description */}
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Detailed Reason / Description <span className="text-rose-500">*</span>
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-700">
+                Detailed Reason / Description <span className="text-rose-500">*</span>
+              </label>
+              {onOpenAiAssistant && (
+                <button
+                  type="button"
+                  id="student-ai-draft-letter-btn"
+                  onClick={() => {
+                    const prompt = `Main ek college student hoon (Name: ${studentName || 'Student'}, Roll: ${rollNumber || 'Roll No'}, Class: ${className || 'Degree'}). Mujhe "${title || 'Academic Requirement / Certificate'}" ke liye formal college application likhni hai. Meri taraf se Principal ya HOD ke liye ek polite aur clear application draft karke do jise main copy karke apne submission me use kar sakun.`;
+                    onOpenAiAssistant('student_guide', prompt);
+                  }}
+                  className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 hover:underline cursor-pointer"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>✨ AI Help: Draft Application Letter</span>
+                </button>
+              )}
+            </div>
             <textarea
               id="description-input"
               required

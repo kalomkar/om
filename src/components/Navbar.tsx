@@ -9,7 +9,8 @@ import {
   LogOut,
   LayoutDashboard,
   ArrowLeft,
-  ShieldCheck
+  ShieldCheck,
+  Sparkles
 } from 'lucide-react';
 import { getActiveTeacherSession } from '../lib/teacherService';
 
@@ -22,6 +23,7 @@ interface NavbarProps {
   onTeacherLogout: () => void;
   onOpenShare: () => void;
   onGoToStudent: () => void;
+  onOpenAiModal: () => void;
   pendingCount: number;
 }
 
@@ -34,6 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onTeacherLogout,
   onOpenShare,
   onGoToStudent,
+  onOpenAiModal,
   pendingCount,
 }) => {
   return (
@@ -116,6 +119,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Right Action Controls */}
         <div className="flex items-center gap-2">
+          {/* Universal Gemini AI Copilot Button */}
+          <button
+            id="nav-ai-copilot-btn"
+            onClick={onOpenAiModal}
+            className="flex items-center gap-1.5 px-3 py-1.5 sm:py-2 bg-gradient-to-r from-amber-500 via-indigo-600 to-blue-600 hover:from-amber-600 hover:via-indigo-700 hover:to-blue-700 text-white rounded-xl text-xs font-bold shadow-xs transition-all active:scale-95 cursor-pointer"
+            title="Open Gemini Academic AI Assistant & Copilot"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-200 animate-pulse" />
+            <span>AI Copilot</span>
+          </button>
+
           {portal === 'student' ? (
             /* Student Portal -> Clean helpdesk badge (Teacher Login removed as requested) */
             <div className="flex items-center gap-1.5 px-2.5 py-1 text-slate-500 text-xs font-medium">
