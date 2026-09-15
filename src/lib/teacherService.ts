@@ -210,7 +210,7 @@ export async function authenticateTeacher(
         saveLocalTeacherAccounts(updated);
         return { success: true, teacher: teacherData };
       } else {
-        return { success: false, error: 'गलत पासवर्ड (Incorrect Password) - कृपया पुनः प्रयास करें।' };
+        return { success: false, error: 'Incorrect password. Please verify and try again.' };
       }
     }
   } catch (err) {
@@ -219,7 +219,7 @@ export async function authenticateTeacher(
 
   return { 
     success: false, 
-    error: 'गलत Teacher ID या पासवर्ड। कृपया ID: 9771 एवं Password: 123456 या आपका नया बनाया गया खाता उपयोग करें।' 
+    error: 'Invalid Teacher ID or password. Please use ID: 9771 with Password: 123456 or your newly registered faculty account.' 
   };
 }
 

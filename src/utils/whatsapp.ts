@@ -28,7 +28,7 @@ export function cleanPhoneNumber(phone: string): string {
 export function createStudentReceiptWhatsAppUrl(request: StudentRequest, portalUrl: string): string {
   const cleanPhone = cleanPhoneNumber(request.phone);
   const trackUrl = `${portalUrl.replace(/\/$/, '')}?track=${encodeURIComponent(request.id)}`;
-  const dateStr = new Date(request.createdAt).toLocaleDateString('hi-IN', {
+  const dateStr = new Date(request.createdAt).toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -38,8 +38,8 @@ export function createStudentReceiptWhatsAppUrl(request: StudentRequest, portalU
 
   const message = `🏛️ *SRN Mehta College Kalburgi - Student Request Desk*
 ----------------------------------------
-नमस्ते *${request.studentName}*,
-आपका आवेदन सफलतापूर्वक दर्ज कर लिया गया है।
+Hello *${request.studentName}*,
+Your academic request has been successfully registered.
 
 📌 *Tracking ID:* ${request.id}
 🎓 *Roll No:* ${request.rollNumber}
@@ -47,12 +47,12 @@ export function createStudentReceiptWhatsAppUrl(request: StudentRequest, portalU
 📝 *Subject:* ${request.title}
 🏷️ *Category:* ${request.category.toUpperCase()}
 📅 *Date:* ${dateStr}
-⏳ *Status:* Pending Review (शिक्षक समीक्षा हेतु लंबित)
+⏳ *Status:* Pending Review
 
 🔍 *Live Status Track Link:*
 ${trackUrl}
 
-जैसे ही आपके क्लास टीचर आवेदन की समीक्षा करेंगे, आपको सूचित किया जाएगा। धन्यवाद!`;
+You will be notified once your class teacher reviews your application. Thank you!`;
 
   const baseUrl = cleanPhone ? `https://wa.me/${cleanPhone}` : 'https://api.whatsapp.com/send';
   return `${baseUrl}?text=${encodeURIComponent(message)}`;
@@ -72,21 +72,21 @@ export function createTeacherStatusUpdateWhatsAppUrl(
   const trackUrl = `${siteUrl}?track=${encodeURIComponent(request.id)}`;
 
   let statusText = 'Pending';
-  if (newStatus === 'approved') statusText = '✅ Approved (स्वीकृत/तैयार)';
-  else if (newStatus === 'in_review') statusText = '🔍 In Review (समीक्षाधीन)';
-  else if (newStatus === 'resolved') statusText = '🎉 Resolved / Handed Over (वितरित)';
-  else if (newStatus === 'rejected') statusText = '❌ Rejected (अस्वीकृत)';
+  if (newStatus === 'approved') statusText = '✅ Approved / Ready';
+  else if (newStatus === 'in_review') statusText = '🔍 Under Review';
+  else if (newStatus === 'resolved') statusText = '🎉 Completed & Delivered';
+  else if (newStatus === 'rejected') statusText = '❌ Rejected / Needs Correction';
 
   const message = `🏛️ *SRN Mehta College Kalburgi - Faculty Notification*
 ----------------------------------------
-प्रिय *${request.studentName}* (Roll: ${request.rollNumber}),
+Dear *${request.studentName}* (Roll: ${request.rollNumber}),
 
-आपके आवेदन *#${request.id}* का स्टेटस अपडेट किया गया है:
+The status of your request *#${request.id}* has been updated:
 
 📌 *Subject:* ${request.title}
 📊 *Current Status:* ${statusText}
 ${remarks ? `💬 *Teacher Remarks:* "${remarks}"\n` : ''}
-🔗 *View & Download Details:*
+🔗 *View & Track Details:*
 ${trackUrl}
 
 — Class Teacher / Faculty Desk

@@ -123,7 +123,7 @@ export const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
           </div>
           <h2 className="text-xl font-bold text-white">Submission Successful!</h2>
           <p className="text-emerald-100 text-xs mt-1">
-            आपका आवेदन सफलतापूर्वक दर्ज कर लिया गया है
+            Your application has been registered successfully
           </p>
         </div>
 
@@ -228,7 +228,7 @@ export const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-emerald-950">WhatsApp Confirmation Slip</h4>
-                    <p className="text-[11px] text-emerald-700">व्हाट्सएप पर आधिकारिक रसीद व ट्रैकिंग लिंक</p>
+                    <p className="text-[11px] text-emerald-700">Official receipt and tracking link via WhatsApp</p>
                   </div>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full border border-emerald-200">
@@ -265,7 +265,7 @@ export const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
                 </button>
               </div>
               <p className="text-[10px] text-emerald-600 text-center">
-                यदि व्हाट्सएप अपने आप नहीं खुला तो ऊपर "Open WhatsApp" बटन दबाएं।
+                If WhatsApp does not open automatically, tap the 'Open WhatsApp' button above.
               </p>
             </div>
           )}

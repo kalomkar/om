@@ -385,7 +385,7 @@ KEY WORKFLOWS:
                 <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                   <span className="font-bold text-xs text-slate-900 block">Step 1: Open Terminal / CMD in Project Folder</span>
                   <p className="text-xs text-slate-600">
-                    ZIP फ़ाइल को Extract करें और उस फ़ोल्डर में Command Prompt या VS Code Terminal खोलें।
+                    Extract the downloaded project ZIP file and open Command Prompt, PowerShell, or VS Code Terminal in that root folder.
                   </p>
                 </div>
 
@@ -402,7 +402,7 @@ npm install
 npm run dev
                   </pre>
                   <p className="text-xs text-slate-500">
-                    ब्राउज़र में खोलें: <strong className="text-slate-800">http://localhost:3000</strong>
+                    Open in your browser: <strong className="text-slate-800">http://localhost:3000</strong>
                   </p>
                 </div>
 

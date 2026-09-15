@@ -59,21 +59,21 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
 
     const cleanId = teacherId.trim();
     if (!cleanId) {
-      setErrorMsg('कृपया Teacher ID दर्ज करें।');
+      setErrorMsg('Please enter a Teacher ID.');
       return;
     }
     if (!name.trim()) {
-      setErrorMsg('कृपया शिक्षक का नाम दर्ज करें।');
+      setErrorMsg('Please enter the teacher\'s full name.');
       return;
     }
     if (!password.trim() || password.trim().length < 4) {
-      setErrorMsg('पासवर्ड न्यूनतम 4 अक्षरों का होना चाहिए।');
+      setErrorMsg('Password must be at least 4 characters long.');
       return;
     }
 
     // Check duplicate
     if (teachers.some(t => t.teacherId.toLowerCase() === cleanId.toLowerCase())) {
-      setErrorMsg(`Teacher ID "${cleanId}" पहले से मौजूद है। कृपया दूसरी ID चुनें।`);
+      setErrorMsg(`Teacher ID "${cleanId}" already exists. Please choose a different ID.`);
       return;
     }
 
@@ -89,7 +89,7 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
       };
 
       await addTeacherAccount(newAcc);
-      setSuccessMsg(`नया शिक्षक खाता (ID: ${cleanId}) सफलतापूर्वक बनाया गया और क्लाउड पर सुरक्षित हो गया!`);
+      setSuccessMsg(`New teacher account (ID: ${cleanId}) created successfully and synced to cloud!`);
       
       // Reset fields
       setTeacherId('');
@@ -101,7 +101,7 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
         onAccountCreated(newAcc);
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'खाता बनाने में समस्या आई। पुनः प्रयास करें।');
+      setErrorMsg(err.message || 'Failed to create teacher account. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -109,18 +109,18 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
 
   const handleDelete = async (id: string) => {
     if (id === PRIMARY_TEACHER.teacherId) {
-      alert('मुख्य शिक्षक ID (9771) को हटाया नहीं जा सकता।');
+      alert('The primary teacher ID (9771) cannot be deleted.');
       return;
     }
-    if (!window.confirm(`क्या आप Teacher ID ${id} का खाता हटाना चाहते हैं?`)) {
+    if (!window.confirm(`Are you sure you want to delete Teacher ID ${id}?`)) {
       return;
     }
 
     try {
       await deleteTeacherAccount(id);
-      setSuccessMsg(`Teacher ID ${id} का खाता हटा दिया गया।`);
+      setSuccessMsg(`Teacher ID ${id} account was removed.`);
     } catch (err: any) {
-      setErrorMsg(err.message || 'खाता हटाने में त्रुटि।');
+      setErrorMsg(err.message || 'Error deleting teacher account.');
     }
   };
 
@@ -141,7 +141,7 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
                 </span>
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                नया शिक्षक खाता जोड़ें अथवा सभी पंजीकृत शिक्षक देखें
+                Add new faculty accounts or manage existing registered teachers
               </p>
             </div>
           </div>
@@ -166,7 +166,7 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
             }`}
           >
             <UserPlus className="w-3.5 h-3.5" />
-            <span>+ Add New Teacher (नया जोड़ें)</span>
+            <span>+ Add New Teacher</span>
           </button>
           <button
             type="button"
@@ -203,13 +203,13 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Teacher ID (लॉगिन ID) *
+                    Teacher ID *
                   </label>
                   <div className="relative">
                     <input
                       type="text"
                       required
-                      placeholder="e.g. 9772 या T-102"
+                      placeholder="e.g. 9772 or T-102"
                       value={teacherId}
                       onChange={(e) => setTeacherId(e.target.value)}
                       className="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition-all"
@@ -238,7 +238,7 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Teacher Full Name (शिक्षक का पूरा नाम) *
+                  Teacher Full Name *
                 </label>
                 <div className="relative">
                   <input
@@ -310,10 +310,10 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
             <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-500 space-y-1">
               <p className="font-semibold text-slate-700 flex items-center gap-1.5">
                 <Lock className="w-3 h-3 text-emerald-600" />
-                <span>सुरक्षित लॉगिन सिस्टम:</span>
+                <span>Secure Authentication:</span>
               </p>
               <p>
-                यहाँ बनाया गया नया शिक्षक खाता तुरंत Google Cloud पर सिंक हो जाएगा और किसी भी फोन या कंप्यूटर से लॉगिन किया जा सकेगा।
+                Newly created teacher accounts sync directly to Google Cloud Firestore and can be accessed from any phone or computer.
               </p>
             </div>
           </div>
@@ -323,7 +323,7 @@ export const AddTeacherModal: React.FC<AddTeacherModalProps> = ({
         {activeTab === 'list' && (
           <div className="p-6 space-y-3 max-h-[400px] overflow-y-auto">
             <p className="text-xs text-slate-500">
-              पंजीकृत शिक्षक जो पोर्टल में लॉगिन कर सकते हैं:
+              Registered teachers authorized to access the faculty dashboard:
             </p>
 
             <div className="space-y-2">

@@ -16,7 +16,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, portalU
     ? `${portalUrl}&mode=student` 
     : `${portalUrl}?mode=student`;
 
-  const defaultMessage = `नमस्ते प्रिय विद्यार्थियों! 📚\n\nयदि आपको कॉलेज या क्लास से संबंधित किसी दस्तावेज़ (मार्कशीट, बोनाफाइड सर्टिफिकेट, छुट्टी आवेदन, फीस रसीद या अन्य आवश्यकता) की जरूरत है, तो नीचे दिए गए लिंक को खोलकर अपना विवरण और आवश्यक दस्तावेज़ सबमिट करें।\n\n🔗 छात्र आवेदन लिंक:\n${studentUrl}\n\nसबमिट करते ही आपको ट्रैकिंग नंबर और पुष्टिकरण सूचना मिल जाएगी।`;
+  const defaultMessage = `Dear Students! 📚\n\nIf you require any college or classroom documents (Marksheet duplicate, Bonafide certificate, Leave application, Fee receipt, or any other academic requirement), please click the link below to submit your details and documents.\n\n🔗 Student Application Link:\n${studentUrl}\n\nUpon submission, you will receive an instant Tracking Ticket ID and confirmation receipt.`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(studentUrl);
@@ -43,7 +43,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, portalU
             </div>
             <div>
               <h3 className="font-semibold text-lg text-white">Share Student Form Link</h3>
-              <p className="text-blue-100 text-xs">छात्रों के साथ लिंक शेयर करें</p>
+              <p className="text-blue-100 text-xs">Share direct link with student WhatsApp groups or class</p>
             </div>
           </div>
           <button

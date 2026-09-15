@@ -63,7 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             </div>
             <p className="text-[11px] text-slate-500 hidden sm:block">
-              {portal === 'teacher' ? 'कक्षा प्रबंधन एवं समीक्षा कंसोल' : 'छात्र आवेदन एवं स्थिति ट्रैकिंग पोर्टल'}
+              {portal === 'teacher' ? 'Classroom Management & Verification Console' : 'Student Request & Status Tracking Desk'}
             </p>
           </div>
         </div>
@@ -81,7 +81,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <FileEdit className="w-3.5 h-3.5" />
-              <span>Submit Form (आवेदन)</span>
+              <span>Submit Form</span>
             </button>
 
             <button
@@ -94,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <SearchCheck className="w-3.5 h-3.5" />
-              <span>Track Status (स्थिति)</span>
+              <span>Track Status</span>
             </button>
           </nav>
         ) : isTeacherLoggedIn ? (

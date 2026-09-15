@@ -47,32 +47,18 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
         onLoginSuccess();
       } else {
         setIsLoading(false);
-        setErrorMessage(result.error || 'अमान्य क्रेडेंशियल्स। कृपया Teacher ID: 9771 एवं Password: 123456 दर्ज करें।');
+        setErrorMessage(result.error || 'Invalid credentials. Please enter Teacher ID: 9771 and Password: 123456.');
       }
     } catch {
       setIsLoading(false);
-      setErrorMessage('लॉगिन करने में त्रुटि आई। कृपया पुनः प्रयास करें।');
-    }
-  };
-
-  const handleQuickOfficialLogin = async () => {
-    setTeacherId(PRIMARY_TEACHER.teacherId);
-    setPassword(PRIMARY_TEACHER.password);
-    setErrorMessage('');
-    setInfoMessage('');
-    setIsLoading(true);
-
-    const result = await authenticateTeacher(PRIMARY_TEACHER.teacherId, PRIMARY_TEACHER.password);
-    setIsLoading(false);
-    if (result.success) {
-      onLoginSuccess();
+      setErrorMessage('Login failed due to an error. Please try again.');
     }
   };
 
   const handleAccountCreated = (newAcc: TeacherAccount) => {
     setTeacherId(newAcc.teacherId);
     setPassword(newAcc.password);
-    setInfoMessage(`नया शिक्षक खाता ${newAcc.name} (ID: ${newAcc.teacherId}) बन गया है। आप सीधे "Login to Dashboard" पर क्लिक कर सकते हैं!`);
+    setInfoMessage(`New teacher account ${newAcc.name} (ID: ${newAcc.teacherId}) created successfully! You can now click "Login to Dashboard".`);
     setIsAddTeacherOpen(false);
   };
 
@@ -88,7 +74,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
             Teacher / Admin Login
           </h1>
           <p className="text-xs text-slate-500">
-            SRN Mehta College • शिक्षक एवं प्रशासक लॉगिन पोर्टल
+            SRN Mehta College • Faculty & Administration Portal
           </p>
         </div>
 
@@ -97,7 +83,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-blue-950 font-bold text-xs">
               <Sparkles className="w-4 h-4 text-blue-600" />
-              <span>Official Teacher Credentials (कॉलेज क्रेडेंशियल्स)</span>
+              <span>Official Teacher Credentials</span>
             </div>
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-200/80 text-blue-900 font-semibold">
               Authorized
@@ -115,17 +101,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <button
-              type="button"
-              id="quick-official-login-btn"
-              onClick={handleQuickOfficialLogin}
-              className="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-[0.99]"
-            >
-              <KeyRound className="w-3.5 h-3.5" />
-              <span>1-Click Auto Fill & Login</span>
-            </button>
-
+          <div>
             <button
               type="button"
               id="open-add-teacher-modal-btn"
@@ -133,7 +109,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
               className="w-full py-2 px-3 bg-white hover:bg-slate-50 text-blue-700 border border-blue-300 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-[0.99]"
             >
               <UserPlus className="w-3.5 h-3.5 text-blue-600" />
-              <span>+ Add New Teacher</span>
+              <span>+ Add New Teacher / Manage Faculty</span>
             </button>
           </div>
         </div>
@@ -156,7 +132,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Teacher ID (शिक्षक आईडी)
+                Teacher ID
               </label>
               <div className="relative">
                 <input
@@ -174,7 +150,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Password / PIN (पासवर्ड)
+                Password / PIN
               </label>
               <div className="relative">
                 <input
@@ -224,7 +200,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
               className="text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1.5 transition-colors"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Student Portal (छात्र पोर्टल)</span>
+              <span>Back to Student Portal</span>
             </button>
             <div className="flex items-center gap-1 text-slate-400 text-[11px]">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />

@@ -175,7 +175,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
               Collect Requirements & Documents from Students
             </h2>
             <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed">
-              यह लिंक अपनी क्लास के छात्रों (WhatsApp ग्रुप या क्लासरूम) के साथ शेयर करें। छात्र लिंक खोलकर अपनी जरूरत व दस्तावेज़ भरेंगे और सीधे आपके इस डैशबोर्ड में आ जाएंगे।
+              Share this link with your students (via WhatsApp class groups or classroom). Students submit their requests and attachments directly to this faculty dashboard.
             </p>
           </div>
 
@@ -319,7 +319,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-hidden focus:border-blue-500 cursor-pointer"
             >
-              <option value="all">All Categories (सभी प्रकार)</option>
+              <option value="all">All Categories</option>
               {CATEGORIES.map(c => (
                 <option key={c.id} value={c.id}>{c.label}</option>
               ))}
@@ -332,7 +332,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
               className="px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 shrink-0"
             >
               <Database className="w-3.5 h-3.5 text-blue-200" />
-              <span>View Database (डेटाबेस देखें)</span>
+              <span>View Database</span>
             </button>
 
             <button
@@ -342,7 +342,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
               className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 shrink-0"
             >
               <FileText className="w-3.5 h-3.5 text-blue-300" />
-              <span>Project Report (प्रोजेक्ट रिपोर्ट)</span>
+              <span>Project Report</span>
             </button>
 
             <button
@@ -352,7 +352,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
               className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 shrink-0"
             >
               <UserPlus className="w-3.5 h-3.5" />
-              <span>+ Add Teacher (शिक्षक जोड़ें)</span>
+              <span>+ Add Teacher</span>
             </button>
 
             <button

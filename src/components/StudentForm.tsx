@@ -6,7 +6,6 @@ import {
   FileCheck, 
   X, 
   AlertCircle, 
-  Sparkles,
   Clock,
   ShieldCheck,
   FileText,
@@ -80,19 +79,6 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const handleDemoFill = () => {
-    setStudentName('Mohammad Farhan');
-    setRollNumber('CS-2024-89');
-    setClassName('B.Tech CS 3rd Year');
-    setSection('Section B');
-    setPhone('+91 99887 76655');
-    setEmail('farhan.student@college.edu');
-    setTitle('Request for Character & Bonafide Certificate for Internship');
-    setDescription('Respected Teacher, I have been selected for a summer internship program at Tech Solutions. The company requires a verified Character and Bonafide Certificate from our department.');
-    setUrgency('high');
-    setConfirmed(true);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -207,21 +193,8 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
           Submit Your Requirement / Document Request
         </h1>
         <p className="text-sm text-slate-500 max-w-lg mx-auto mt-2">
-          विद्यार्थी अपनी आवश्यकता या दस्तावेज़ का विवरण यहाँ भरें। आपका डेटा सीधे क्लास टीचर के डैशबोर्ड में सुरक्षित सेव हो जाएगा।
+          Students can enter academic requests, certificate applications, or document requirements here. Your request will be directly submitted to the faculty dashboard.
         </p>
-
-        {/* Quick Demo Fill Button */}
-        <div className="mt-4">
-          <button
-            type="button"
-            id="demo-fill-btn"
-            onClick={handleDemoFill}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Quick Demo Fill (परीक्षण हेतु भरें)
-          </button>
-        </div>
       </div>
 
       {errorMessage && (
@@ -241,7 +214,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
             </div>
             <div>
               <h2 className="font-semibold text-slate-900 text-base">Student Information</h2>
-              <p className="text-xs text-slate-500">विद्यार्थी का व्यक्तिगत व क्लास विवरण</p>
+              <p className="text-xs text-slate-500">Student personal and classroom details</p>
             </div>
           </div>
 
@@ -326,7 +299,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
               <div className="mt-2 space-y-1.5">
                 <div className="flex items-center gap-1.5 text-[11px] text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/70">
                   <MessageCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span><b>WhatsApp ऑटो-मैसेज:</b> फॉर्म सबमिट होते ही इस नंबर पर रसीद भेजी जाएगी</span>
+                  <span><b>WhatsApp Confirmation:</b> An official receipt will be generated for this number</span>
                 </div>
                 
                 <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-600 select-none pt-0.5">
@@ -337,7 +310,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
                     onChange={(e) => setNotifyOnWhatsApp(e.target.checked)}
                     className="w-3.5 h-3.5 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
                   />
-                  <span>सबमिट करते ही व्हाट्सएप पर तुरंत रसीद खोलें</span>
+                  <span>Automatically open WhatsApp receipt upon submission</span>
                 </label>
               </div>
             </div>
@@ -367,14 +340,14 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
             </div>
             <div>
               <h2 className="font-semibold text-slate-900 text-base">Requirement & Document Details</h2>
-              <p className="text-xs text-slate-500">अपनी आवश्यकता या समस्या का विवरण लिखें</p>
+              <p className="text-xs text-slate-500">Provide specific information about your request or issue</p>
             </div>
           </div>
 
           {/* Subject / Title */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Subject / Requirement Title (आवश्यकता का विषय) <span className="text-rose-500">*</span>
+              Subject / Requirement Title <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
               <input
@@ -393,13 +366,13 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
           {/* Detailed Description */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Detailed Reason / Description (विस्तार से विवरण बताएं) <span className="text-rose-500">*</span>
+              Detailed Reason / Description <span className="text-rose-500">*</span>
             </label>
             <textarea
               id="description-input"
               required
               rows={4}
-              placeholder="विस्तार से बताएं कि आपको क्या चाहिए और क्यों... (Please describe your requirement or problem clearly)"
+              placeholder="Please describe your requirement or problem clearly..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full p-3 text-sm bg-slate-50/50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition-all resize-none"
@@ -409,7 +382,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
           {/* Urgency Level */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-2">
-              Urgency Level (प्राथमिकता)
+              Urgency Level
             </label>
             <div className="grid grid-cols-3 gap-2.5">
               {(['normal', 'high', 'urgent'] as RequestUrgency[]).map((lvl) => {
@@ -443,7 +416,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
             </div>
             <div>
               <h2 className="font-semibold text-slate-900 text-base">Attach Document or Proof (Optional)</h2>
-              <p className="text-xs text-slate-500">कोई संबंधित दस्तावेज़, रसीद, मेडिकल पर्ची या फोटो अपलोड करें</p>
+              <p className="text-xs text-slate-500">Attach any relevant document, receipt, medical slip, or photo</p>
             </div>
           </div>
 
@@ -508,7 +481,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
               className="mt-0.5 w-4 h-4 rounded-sm border-slate-300 text-blue-600 focus:ring-blue-500"
             />
             <span className="text-xs text-slate-600 leading-relaxed">
-              मैं प्रमाणित करता/करती हूँ कि ऊपर दी गई जानकारी सही है। सबमिट करने पर मुझे पुष्टिकरण संदेश (SMS/Notification) प्राप्त होगा।
+              I hereby certify that the information provided above is accurate and true. A tracking confirmation ID will be generated upon submission.
             </span>
           </label>
 
@@ -526,7 +499,7 @@ export const StudentForm: React.FC<StudentFormProps> = ({ onSuccess }) => {
             ) : (
               <>
                 <Send className="w-4 h-4" />
-                <span>Submit Requirement (अनुरोध सबमिट करें)</span>
+                <span>Submit Requirement</span>
               </>
             )}
           </button>

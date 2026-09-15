@@ -120,22 +120,22 @@ The **Student Requirement & Academic Request Management System** is an instituti
   [ Student Submits Form ]
             │
             ▼
-    Status: "PENDING" (लंबित) ──► Instant Ticket ID generated (REQ-XXXX)
+     Status: "PENDING" ──► Instant Ticket ID generated (REQ-XXXX)
             │
             ▼
   [ Teacher Reviews on Dashboard ]
             │
       ┌─────┴────────────────────────┐
       ▼                              ▼
-Status: "UNDER REVIEW"        Status: "REJECTED" (अस्वीकृत)
-(समीक्षाधीन)                   (With specific remarks & feedback)
+Status: "UNDER REVIEW"        Status: "REJECTED"
+(In-Progress Verification)    (With specific remarks & feedback)
       │
       ▼
-Status: "APPROVED" (स्वीकृत)
+Status: "APPROVED"
 (Verified & ready for collection)
       │
       ▼
-Status: "RESOLVED" (पूर्ण / निस्तारित)
+Status: "RESOLVED"
 (Document handed over / Completed)
 ```
 
@@ -175,7 +175,7 @@ Status: "RESOLVED" (पूर्ण / निस्तारित)
      - `under_review` ➔ `approved`
      - `under_review` ➔ `rejected`
      - `approved` ➔ `resolved`
-   - **Teacher Remarks (आधिकारिक टिप्पणी):** Add instructions (e.g., *"Verified. Please collect signed certificate from Room 12 tomorrow 11 AM"*).
+   - **Teacher Remarks:** Add instructions (e.g., *"Verified. Please collect signed certificate from Room 12 tomorrow 11 AM"*).
 4. **Export Capabilities:**
    - **Export CSV:** One-click download of all institutional records formatted for Microsoft Excel / Google Sheets.
    - **DB Explorer:** View raw formatted JSON or download a `.json` backup file.

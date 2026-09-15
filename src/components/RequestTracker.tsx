@@ -67,7 +67,7 @@ export const RequestTracker: React.FC<RequestTrackerProps> = ({ initialTrackingI
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-slate-900">Track Your Submission Status</h1>
         <p className="text-sm text-slate-500 mt-1">
-          अपना ट्रैकिंग आईडी (e.g., REQ-10482) या रोल नंबर दर्ज करके स्थिति जांचें
+          Enter your Tracking Reference ID (e.g., REQ-10482) or student roll number to check progress
         </p>
       </div>
 

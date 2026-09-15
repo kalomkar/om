@@ -397,24 +397,24 @@ export const DatabaseModal: React.FC<DatabaseModalProps> = ({
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4.5">
                 <h4 className="text-sm font-bold text-blue-900 mb-1.5 flex items-center gap-2">
                   <Database className="w-4 h-4 text-blue-700" />
-                  आपका डेटाबेस कैसे काम करता है? (How your dynamic database works)
+                  How Your Dynamic Database Works
                 </h4>
                 <p className="text-xs text-blue-800 leading-relaxed">
-                  आपका सिस्टम <b>100% डायनामिक (Dynamic)</b> है। जब भी कोई छात्र लिंक खोलकर फॉर्म भरता है, वह तुरंत सर्वर पर मौजूद <code>data/database.json</code> फाइल में सुरक्षित लिख दिया जाता है। आपको सर्वर दोबारा रीस्टार्ट करने या मैनुअल सेव करने की कोई ज़रूरत नहीं है।
+                  Your system is <b>100% dynamic</b>. Whenever a student fills out the request form, their submission is instantly recorded and persisted directly into both Google Cloud Firestore and the server's <code>data/database.json</code> file. No manual saving or server restart is ever required.
                 </p>
               </div>
 
               <div className="space-y-4">
-                <h4 className="text-sm font-bold text-slate-800">डेटाबेस देखने और डाउनलोड करने के 3 आसान तरीके:</h4>
+                <h4 className="text-sm font-bold text-slate-800">3 Easy Ways to Access and Export Data:</h4>
 
                 {/* Method 1 */}
                 <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center">1</span>
-                    <h5 className="text-xs font-bold text-slate-900">ब्राउज़र में सीधे लाइव JSON डेटा देखना</h5>
+                    <h5 className="text-xs font-bold text-slate-900">Direct Live JSON Endpoint in Browser</h5>
                   </div>
                   <p className="text-xs text-slate-600 pl-8">
-                    आप अपने ब्राउज़र के एड्रेस बार में कभी भी यह लिंक खोल सकते हैं। यह आपको रियल-टाइम JSON रिकॉर्ड्स दिखाता है:
+                    You can open this endpoint at any time in your browser address bar to view real-time live JSON records:
                   </p>
                   <div className="pl-8 flex items-center gap-2">
                     <code className="px-2.5 py-1 bg-slate-100 text-slate-800 rounded font-mono text-xs border border-slate-200">
@@ -436,10 +436,10 @@ export const DatabaseModal: React.FC<DatabaseModalProps> = ({
                 <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center">2</span>
-                    <h5 className="text-xs font-bold text-slate-900">एक्सेल / गूगल शीट्स में डाउनलोड करना (Excel CSV)</h5>
+                    <h5 className="text-xs font-bold text-slate-900">Download Spreadsheet for Excel / Google Sheets</h5>
                   </div>
                   <p className="text-xs text-slate-600 pl-8">
-                    ऊपर दिए गए <b>"Export CSV (Excel)"</b> बटन पर क्लिक करें। एक क्लिक में सभी छात्रों के नाम, रोल नंबर, फोन, तारीख और स्टेटस वाली स्प्रेडशीट फाइल डाउनलोड हो जाएगी जिसे आप Excel या Google Sheets में सीधे खोल सकते हैं।
+                    Click the <b>"Export CSV (Excel)"</b> button above. With one click, all student records, roll numbers, phone contacts, timestamps, and request statuses will download as a spreadsheet compatible with Microsoft Excel and Google Sheets.
                   </p>
                 </div>
 
@@ -447,10 +447,10 @@ export const DatabaseModal: React.FC<DatabaseModalProps> = ({
                 <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
                   <div className="flex items-center gap-2">
                     <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-700 text-xs font-bold flex items-center justify-center">3</span>
-                    <h5 className="text-xs font-bold text-slate-900">प्रोजेक्ट की मूल फ़ाइल (Local File on Server)</h5>
+                    <h5 className="text-xs font-bold text-slate-900">Persistent Server File & Cloud Storage</h5>
                   </div>
                   <p className="text-xs text-slate-600 pl-8 leading-relaxed">
-                    यह फ़ाइल सर्वर के फ़ाइल सिस्टम में <code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-700 font-semibold">data/database.json</code> के रूप में परमानेंट स्टोर रहती है। जब भी आप इसे GitHub पर एक्सपोर्ट करेंगे या Cloud Run पर डिप्लॉय करेंगे, यह फ़ाइल हमेशा उपलब्ध रहेगी।
+                    Data is stored permanently on the server filesystem at <code className="bg-slate-100 px-1 py-0.5 rounded text-indigo-700 font-semibold">data/database.json</code> and synchronized with Google Cloud Firestore, ensuring records remain safe when deployed to Cloud Run or exported to GitHub.
                   </p>
                 </div>
               </div>
