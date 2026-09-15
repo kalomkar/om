@@ -29,7 +29,8 @@ import {
   Award,
   BookOpen,
   Code2,
-  BarChart3
+  BarChart3,
+  FileSpreadsheet
 } from 'lucide-react';
 import { StudentRequest, RequestStatus } from '../types';
 import { CATEGORIES, STATUS_CONFIG, URGENCY_CONFIG } from '../utils/categories';
@@ -37,6 +38,7 @@ import { DatabaseModal } from './DatabaseModal';
 import { AddTeacherModal } from './AddTeacherModal';
 import { ProjectReportModal } from './ProjectReportModal';
 import { AnalyticsModal } from './AnalyticsModal';
+import { exportStudentDataToExcel } from '../utils/excelExport';
 import { createTeacherStatusUpdateWhatsAppUrl } from '../utils/whatsapp';
 
 interface TeacherDashboardProps {
@@ -70,6 +72,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isAnalyticsModalOpen, setIsAnalyticsModalOpen] = useState(false);
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
 
   const studentShareUrl = portalUrl.includes('?') 
     ? `${portalUrl}&mode=student` 
@@ -290,6 +293,18 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
     URL.revokeObjectURL(url);
   };
 
+  const handleDownloadExcel = async () => {
+    if (requests.length === 0) return;
+    setIsExportingExcel(true);
+    try {
+      await exportStudentDataToExcel(requests);
+    } catch (err) {
+      console.error('Failed to export formatted Excel file:', err);
+    } finally {
+      setIsExportingExcel(false);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-6">
       {/* Top Banner: Share Link with Class */}
@@ -493,6 +508,17 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
             >
               <UserPlus className="w-3.5 h-3.5" />
               <span>+ Add Teacher</span>
+            </button>
+
+            <button
+              id="export-excel-xlsx-btn"
+              onClick={handleDownloadExcel}
+              disabled={isExportingExcel}
+              title="Download formatted Excel (.xlsx) workbook with multi-sheet analysis, auto-filter, and clean phone numbers"
+              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 shrink-0"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-200" />
+              <span>{isExportingExcel ? 'Exporting...' : 'Excel (.xlsx)'}</span>
             </button>
 
             <button

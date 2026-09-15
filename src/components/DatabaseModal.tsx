@@ -17,6 +17,7 @@ import {
   Server
 } from 'lucide-react';
 import { StudentRequest } from '../types';
+import { exportStudentDataToExcel } from '../utils/excelExport';
 
 interface DatabaseModalProps {
   isOpen: boolean;
@@ -249,6 +250,16 @@ export const DatabaseModal: React.FC<DatabaseModalProps> = ({
 
           {/* Quick Download Buttons */}
           <div className="flex items-center gap-2">
+            <button
+              id="db-export-xlsx-btn"
+              onClick={() => dbData?.records && exportStudentDataToExcel(dbData.records)}
+              disabled={!dbData?.records?.length}
+              title="Download formatted multi-sheet Excel (.xlsx) file"
+              className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5" />
+              <span>Export Formatted Excel (.xlsx)</span>
+            </button>
             <a
               id="db-export-csv-btn"
               href="/api/database/export?format=csv"
