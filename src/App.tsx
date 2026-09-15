@@ -25,6 +25,7 @@ const INITIAL_SEED_DATA: StudentRequest[] = [
     rollNumber: 'CS-2024-42',
     className: 'B.Tech CS 3rd Year',
     section: 'Section B',
+    previousCollegeName: 'Govt PU College, Kalaburagi',
     phone: '+91 98765 43210',
     email: 'aarav.sharma@college.edu',
     category: 'certificate',
@@ -32,6 +33,20 @@ const INITIAL_SEED_DATA: StudentRequest[] = [
     description: 'Sir, I need a Bonafide Certificate with college stamp to apply for the State Merit Scholarship. The last date of submission is next Monday.',
     urgency: 'high',
     status: 'pending',
+    skillRatings: {
+      programming: 'Intermediate',
+      googleDocsWord: 'Advanced',
+      googleSheetsExcel: 'Intermediate',
+      googleForms: 'Advanced',
+      reportWriting: 'Advanced',
+      englishCommunication: 'Intermediate'
+    },
+    academicRequirements: [
+      'Extra Periods / Doubt Classes',
+      'Project Work with Report Writing',
+      'Interview Preparation'
+    ],
+    extraRequirementsNote: 'Need extra sessions on data structures and formal report writing formatting.',
     createdAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
     updatedAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
     notificationSent: true,
@@ -47,6 +62,7 @@ const INITIAL_SEED_DATA: StudentRequest[] = [
     rollNumber: 'CS-2024-18',
     className: 'B.Tech CS 3rd Year',
     section: 'Section A',
+    previousCollegeName: 'St. Xavier Junior College',
     phone: '+91 98123 45678',
     email: 'priya.verma@college.edu',
     category: 'leave',
@@ -60,6 +76,20 @@ const INITIAL_SEED_DATA: StudentRequest[] = [
     },
     status: 'in_review',
     teacherRemarks: 'Prescription noted. Get well soon and submit lab assignments upon return.',
+    skillRatings: {
+      programming: 'Beginner',
+      googleDocsWord: 'Intermediate',
+      googleSheetsExcel: 'Beginner',
+      googleForms: 'Intermediate',
+      reportWriting: 'Beginner',
+      englishCommunication: 'Advanced'
+    },
+    academicRequirements: [
+      'Extra Periods / Doubt Classes',
+      'English Grammar & Communication',
+      'Presentation Slides'
+    ],
+    extraRequirementsNote: 'Requesting additional doubt clearing periods in Java programming.',
     createdAt: new Date(Date.now() - 3600 * 1000 * 20).toISOString(),
     updatedAt: new Date(Date.now() - 3600 * 1000 * 10).toISOString(),
     notificationSent: true,
@@ -75,6 +105,7 @@ const INITIAL_SEED_DATA: StudentRequest[] = [
     rollNumber: 'CS-2024-55',
     className: 'B.Tech CS 3rd Year',
     section: 'Section B',
+    previousCollegeName: 'National Model School & College',
     phone: '+91 97234 56789',
     email: 'rahul.patel@college.edu',
     category: 'document',
@@ -83,6 +114,19 @@ const INITIAL_SEED_DATA: StudentRequest[] = [
     urgency: 'normal',
     status: 'approved',
     teacherRemarks: 'Verified and signed. You can collect the printed original from Admin Block Counter #3.',
+    skillRatings: {
+      programming: 'Advanced',
+      googleDocsWord: 'Advanced',
+      googleSheetsExcel: 'Advanced',
+      googleForms: 'Advanced',
+      reportWriting: 'Advanced',
+      englishCommunication: 'Advanced'
+    },
+    academicRequirements: [
+      'Website Design',
+      'Interview Preparation'
+    ],
+    extraRequirementsNote: 'Looking for mock technical interviews before campus placements.',
     createdAt: new Date(Date.now() - 3600 * 1000 * 48).toISOString(),
     updatedAt: new Date(Date.now() - 3600 * 1000 * 18).toISOString(),
     notificationSent: true,

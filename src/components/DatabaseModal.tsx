@@ -298,6 +298,7 @@ export const DatabaseModal: React.FC<DatabaseModalProps> = ({
                       <th className="px-3.5 py-2.5">Class / Section</th>
                       <th className="px-3.5 py-2.5">Category</th>
                       <th className="px-3.5 py-2.5">Subject / Requirement</th>
+                      <th className="px-3.5 py-2.5">Skills & Needs</th>
                       <th className="px-3.5 py-2.5">Status</th>
                       <th className="px-3.5 py-2.5">Phone / Email</th>
                       <th className="px-3.5 py-2.5">Submitted</th>
@@ -318,6 +319,21 @@ export const DatabaseModal: React.FC<DatabaseModalProps> = ({
                           </td>
                           <td className="px-3.5 py-2.5 font-sans text-slate-800 max-w-[200px] truncate" title={req.title}>
                             {req.title}
+                          </td>
+                          <td className="px-3.5 py-2.5 font-sans text-xs text-slate-700 max-w-[220px]">
+                            {req.previousCollegeName && (
+                              <div className="text-[10px] text-slate-500 truncate font-medium">Prev: {req.previousCollegeName}</div>
+                            )}
+                            {req.academicRequirements && req.academicRequirements.length > 0 && (
+                              <div className="text-[10px] text-blue-700 font-semibold truncate">
+                                {req.academicRequirements.join(', ')}
+                              </div>
+                            )}
+                            {req.skillRatings && (
+                              <div className="text-[9px] text-slate-400 truncate">
+                                P:{req.skillRatings.programming || '-'} | Docs:{req.skillRatings.googleDocsWord || '-'} | Rep:{req.skillRatings.reportWriting || '-'}
+                              </div>
+                            )}
                           </td>
                           <td className="px-3.5 py-2.5 font-sans">
                             <span className={`px-2 py-0.5 rounded-full font-semibold text-[10px] ${
@@ -341,7 +357,7 @@ export const DatabaseModal: React.FC<DatabaseModalProps> = ({
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={9} className="text-center py-8 text-slate-400 font-sans">
+                        <td colSpan={10} className="text-center py-8 text-slate-400 font-sans">
                           No matching records found in database.
                         </td>
                       </tr>

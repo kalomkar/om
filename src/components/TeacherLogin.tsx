@@ -4,16 +4,14 @@ import {
   UserCheck, 
   KeyRound, 
   ArrowRight, 
-  Sparkles, 
   AlertCircle, 
   GraduationCap, 
   Eye, 
   EyeOff,
   ArrowLeft,
-  ShieldCheck,
-  UserPlus
+  ShieldCheck
 } from 'lucide-react';
-import { authenticateTeacher, PRIMARY_TEACHER } from '../lib/teacherService';
+import { authenticateTeacher } from '../lib/teacherService';
 import { AddTeacherModal } from './AddTeacherModal';
 import { TeacherAccount } from '../types';
 
@@ -47,7 +45,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
         onLoginSuccess();
       } else {
         setIsLoading(false);
-        setErrorMessage(result.error || 'Invalid credentials. Please enter Teacher ID: 9771 and Password: 123456.');
+        setErrorMessage(result.error || 'Invalid Teacher ID or Password. Please check your credentials.');
       }
     } catch {
       setIsLoading(false);
@@ -58,7 +56,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
   const handleAccountCreated = (newAcc: TeacherAccount) => {
     setTeacherId(newAcc.teacherId);
     setPassword(newAcc.password);
-    setInfoMessage(`New teacher account ${newAcc.name} (ID: ${newAcc.teacherId}) created successfully! You can now click "Login to Dashboard".`);
+    setInfoMessage(`New teacher account ${newAcc.name} created successfully! You can now log in.`);
     setIsAddTeacherOpen(false);
   };
 
@@ -76,42 +74,6 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
           <p className="text-xs text-slate-500">
             SRN Mehta College • Faculty & Administration Portal
           </p>
-        </div>
-
-        {/* Official College Teacher Credentials Card */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50/70 border border-blue-200/90 rounded-2xl p-4 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-blue-950 font-bold text-xs">
-              <Sparkles className="w-4 h-4 text-blue-600" />
-              <span>Official Teacher Credentials</span>
-            </div>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-200/80 text-blue-900 font-semibold">
-              Authorized
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="bg-white/90 p-2.5 rounded-xl border border-blue-200/70">
-              <span className="text-[10px] text-slate-400 block font-medium">Teacher ID:</span>
-              <span className="font-mono font-bold text-blue-900 text-sm select-all">9771</span>
-            </div>
-            <div className="bg-white/90 p-2.5 rounded-xl border border-blue-200/70">
-              <span className="text-[10px] text-slate-400 block font-medium">Password:</span>
-              <span className="font-mono font-bold text-blue-900 text-sm select-all">123456</span>
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="button"
-              id="open-add-teacher-modal-btn"
-              onClick={() => setIsAddTeacherOpen(true)}
-              className="w-full py-2 px-3 bg-white hover:bg-slate-50 text-blue-700 border border-blue-300 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-[0.99]"
-            >
-              <UserPlus className="w-3.5 h-3.5 text-blue-600" />
-              <span>+ Add New Teacher / Manage Faculty</span>
-            </button>
-          </div>
         </div>
 
         {/* Login Form */}
@@ -132,14 +94,14 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                Teacher ID
+                Teacher / Admin ID
               </label>
               <div className="relative">
                 <input
                   id="teacher-id-input"
                   type="text"
                   required
-                  placeholder="9771"
+                  placeholder="Enter Faculty ID"
                   value={teacherId}
                   onChange={(e) => setTeacherId(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition-all"
@@ -157,7 +119,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
                   id="teacher-password-input"
                   type={showPassword ? 'text' : 'password'}
                   required
-                  placeholder="123456"
+                  placeholder="Enter Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-9 pr-10 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-hidden transition-all"
@@ -204,7 +166,7 @@ export const TeacherLogin: React.FC<TeacherLoginProps> = ({
             </button>
             <div className="flex items-center gap-1 text-slate-400 text-[11px]">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Faculty Only</span>
+              <span>Authorized Faculty Only</span>
             </div>
           </div>
         </div>

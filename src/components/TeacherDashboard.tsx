@@ -138,30 +138,76 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
 
   const handleExportCSV = () => {
     if (requests.length === 0) return;
-    const headers = ['Tracking ID', 'Student Name', 'Roll Number', 'Class', 'Category', 'Subject', 'Status', 'Urgency', 'Phone', 'Email', 'Remarks', 'Date'];
-    const rows = requests.map(r => [
-      `"${r.id}"`,
-      `"${r.studentName}"`,
-      `"${r.rollNumber}"`,
-      `"${r.className} ${r.section || ''}"`,
-      `"${r.category}"`,
-      `"${r.title.replace(/"/g, '""')}"`,
-      `"${r.status}"`,
-      `"${r.urgency}"`,
-      `"${r.phone || ''}"`,
-      `"${r.email || ''}"`,
-      `"${(r.teacherRemarks || '').replace(/"/g, '""')}"`,
-      `"${new Date(r.createdAt).toLocaleString()}"`
-    ]);
+    const headers = [
+      'Tracking ID',
+      'Submission Date',
+      'Student Name',
+      'Roll Number',
+      'Class',
+      'Section',
+      'Previous College Name',
+      'Category',
+      'Subject / Title',
+      'Description / Reason',
+      'Status',
+      'Urgency',
+      '1. Programming Skills (Beginner / Intermediate / Advanced)',
+      '2. Google Docs & MS Word (Beginner / Intermediate / Advanced)',
+      '3. Google Sheets & MS Excel (Beginner / Intermediate / Advanced)',
+      '4. Google Forms (Beginner / Intermediate / Advanced)',
+      '5. Report Writing Skills (i. Beginner / ii. Advanced)',
+      '6. English Communication (Beginner / Intermediate / Advanced)',
+      '7. Present Academic Requirements (Extra Periods / Special Classes)',
+      'Specific Requirements Note / Timing',
+      'Phone Number',
+      'Email Address',
+      'Teacher Remarks'
+    ];
 
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-    const encodedUri = encodeURI(csvContent);
+    const escape = (val: string | undefined | null) => `"${(val || '').replace(/"/g, '""')}"`;
+
+    const rows = requests.map(r => {
+      const reqList = (r.academicRequirements && r.academicRequirements.length > 0)
+        ? r.academicRequirements.join('; ')
+        : 'None selected';
+
+      return [
+        escape(r.id),
+        escape(new Date(r.createdAt).toLocaleString()),
+        escape(r.studentName),
+        escape(r.rollNumber),
+        escape(r.className),
+        escape(r.section || ''),
+        escape(r.previousCollegeName || 'N/A'),
+        escape(r.category),
+        escape(r.title),
+        escape(r.description),
+        escape(r.status),
+        escape(r.urgency),
+        escape(r.skillRatings?.programming || 'Not Answered'),
+        escape(r.skillRatings?.googleDocsWord || 'Not Answered'),
+        escape(r.skillRatings?.googleSheetsExcel || 'Not Answered'),
+        escape(r.skillRatings?.googleForms || 'Not Answered'),
+        escape(r.skillRatings?.reportWriting || 'Not Answered'),
+        escape(r.skillRatings?.englishCommunication || 'Not Answered'),
+        escape(reqList),
+        escape(r.extraRequirementsNote || ''),
+        escape(r.phone || ''),
+        escape(r.email || ''),
+        escape(r.teacherRemarks || '')
+      ].join(',');
+    });
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `student_requests_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.href = url;
+    link.setAttribute('download', `student_requests_detailed_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (

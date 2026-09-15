@@ -5,6 +5,7 @@
     "rollNumber": "CS-2024-42",
     "className": "B.Tech CS 3rd Year",
     "section": "Section B",
+    "previousCollegeName": "Govt PU College, Kalaburagi",
     "phone": "+91 98765 43210",
     "email": "aarav.sharma@college.edu",
     "category": "certificate",
@@ -12,6 +13,20 @@
     "description": "Sir, I need a Bonafide Certificate with college stamp to apply for the State Merit Scholarship. The last date of submission is next Monday.",
     "urgency": "high",
     "status": "pending",
+    "skillRatings": {
+      "programming": "Intermediate",
+      "googleDocsWord": "Advanced",
+      "googleSheetsExcel": "Intermediate",
+      "googleForms": "Advanced",
+      "reportWriting": "Advanced",
+      "englishCommunication": "Intermediate"
+    },
+    "academicRequirements": [
+      "Extra Periods / Doubt Classes",
+      "Project Work with Report Writing",
+      "Interview Preparation"
+    ],
+    "extraRequirementsNote": "Need extra sessions on data structures and formal report writing formatting.",
     "createdAt": "2026-09-14T10:42:08.991Z",
     "updatedAt": "2026-09-14T10:42:08.992Z",
     "notificationSent": true,
@@ -27,6 +42,7 @@
     "rollNumber": "CS-2024-18",
     "className": "B.Tech CS 3rd Year",
     "section": "Section A",
+    "previousCollegeName": "St. Xavier Junior College",
     "phone": "+91 98123 45678",
     "email": "priya.verma@college.edu",
     "category": "leave",
@@ -40,6 +56,20 @@
     },
     "status": "in_review",
     "teacherRemarks": "Prescription noted. Get well soon and submit lab assignments upon return.",
+    "skillRatings": {
+      "programming": "Beginner",
+      "googleDocsWord": "Intermediate",
+      "googleSheetsExcel": "Beginner",
+      "googleForms": "Intermediate",
+      "reportWriting": "Beginner",
+      "englishCommunication": "Advanced"
+    },
+    "academicRequirements": [
+      "Extra Periods / Doubt Classes",
+      "English Grammar & Communication",
+      "Presentation Slides"
+    ],
+    "extraRequirementsNote": "Requesting additional doubt clearing periods in Java programming.",
     "createdAt": "2026-09-13T18:42:08.992Z",
     "updatedAt": "2026-09-14T04:42:08.992Z",
     "notificationSent": true,
@@ -55,6 +85,7 @@
     "rollNumber": "CS-2024-55",
     "className": "B.Tech CS 3rd Year",
     "section": "Section B",
+    "previousCollegeName": "National Model School & College",
     "phone": "+91 97234 56789",
     "email": "rahul.patel@college.edu",
     "category": "document",
@@ -63,6 +94,19 @@
     "urgency": "normal",
     "status": "approved",
     "teacherRemarks": "Verified and signed. You can collect the printed original from Admin Block Counter #3.",
+    "skillRatings": {
+      "programming": "Advanced",
+      "googleDocsWord": "Advanced",
+      "googleSheetsExcel": "Advanced",
+      "googleForms": "Advanced",
+      "reportWriting": "Advanced",
+      "englishCommunication": "Advanced"
+    },
+    "academicRequirements": [
+      "Website Design",
+      "Interview Preparation"
+    ],
+    "extraRequirementsNote": "Looking for mock technical interviews before campus placements.",
     "createdAt": "2026-09-12T14:42:08.992Z",
     "updatedAt": "2026-09-13T20:42:08.992Z",
     "notificationSent": true,

@@ -70,6 +70,7 @@ function initDatabase(): StudentRequestItem[] {
       rollNumber: 'CS-2024-42',
       className: 'B.Tech CS 3rd Year',
       section: 'Section B',
+      previousCollegeName: 'Govt PU College, Kalaburagi',
       phone: '+91 98765 43210',
       email: 'aarav.sharma@college.edu',
       category: 'certificate',
@@ -77,6 +78,20 @@ function initDatabase(): StudentRequestItem[] {
       description: 'Sir, I need a Bonafide Certificate with college stamp to apply for the State Merit Scholarship. The last date of submission is next Monday.',
       urgency: 'high',
       status: 'pending',
+      skillRatings: {
+        programming: 'Intermediate',
+        googleDocsWord: 'Advanced',
+        googleSheetsExcel: 'Intermediate',
+        googleForms: 'Advanced',
+        reportWriting: 'Advanced',
+        englishCommunication: 'Intermediate'
+      },
+      academicRequirements: [
+        'Extra Periods / Doubt Classes',
+        'Project Work with Report Writing',
+        'Interview Preparation'
+      ],
+      extraRequirementsNote: 'Need extra sessions on data structures and formal report writing formatting.',
       createdAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
       updatedAt: new Date(Date.now() - 3600 * 1000 * 4).toISOString(),
       notificationSent: true,
@@ -92,6 +107,7 @@ function initDatabase(): StudentRequestItem[] {
       rollNumber: 'CS-2024-18',
       className: 'B.Tech CS 3rd Year',
       section: 'Section A',
+      previousCollegeName: 'St. Xavier Junior College',
       phone: '+91 98123 45678',
       email: 'priya.verma@college.edu',
       category: 'leave',
@@ -105,6 +121,20 @@ function initDatabase(): StudentRequestItem[] {
       },
       status: 'in_review',
       teacherRemarks: 'Prescription noted. Get well soon and submit lab assignments upon return.',
+      skillRatings: {
+        programming: 'Beginner',
+        googleDocsWord: 'Intermediate',
+        googleSheetsExcel: 'Beginner',
+        googleForms: 'Intermediate',
+        reportWriting: 'Beginner',
+        englishCommunication: 'Advanced'
+      },
+      academicRequirements: [
+        'Extra Periods / Doubt Classes',
+        'English Grammar & Communication',
+        'Presentation Slides'
+      ],
+      extraRequirementsNote: 'Requesting additional doubt clearing periods in Java programming.',
       createdAt: new Date(Date.now() - 3600 * 1000 * 20).toISOString(),
       updatedAt: new Date(Date.now() - 3600 * 1000 * 10).toISOString(),
       notificationSent: true,
@@ -120,6 +150,7 @@ function initDatabase(): StudentRequestItem[] {
       rollNumber: 'CS-2024-55',
       className: 'B.Tech CS 3rd Year',
       section: 'Section B',
+      previousCollegeName: 'National Model School & College',
       phone: '+91 97234 56789',
       email: 'rahul.patel@college.edu',
       category: 'document',
@@ -128,6 +159,19 @@ function initDatabase(): StudentRequestItem[] {
       urgency: 'normal',
       status: 'approved',
       teacherRemarks: 'Verified and signed. You can collect the printed original from Admin Block Counter #3.',
+      skillRatings: {
+        programming: 'Advanced',
+        googleDocsWord: 'Advanced',
+        googleSheetsExcel: 'Advanced',
+        googleForms: 'Advanced',
+        reportWriting: 'Advanced',
+        englishCommunication: 'Advanced'
+      },
+      academicRequirements: [
+        'Website Design',
+        'Interview Preparation'
+      ],
+      extraRequirementsNote: 'Looking for mock technical interviews before campus placements.',
       createdAt: new Date(Date.now() - 3600 * 1000 * 48).toISOString(),
       updatedAt: new Date(Date.now() - 3600 * 1000 * 18).toISOString(),
       notificationSent: true,
@@ -351,49 +395,62 @@ async function startServer() {
     } else {
       const headers = [
         'Tracking ID',
+        'Submission Date',
         'Student Name',
         'Roll Number',
         'Class',
         'Section',
-        'Previous College',
+        'Previous College Name',
         'Category',
-        'Subject',
+        'Subject / Title',
+        'Description / Reason',
         'Status',
         'Urgency',
-        'Skill Ratings (Prog/Docs/Sheets/Forms/Report/Eng)',
-        'Academic Requirements',
-        'Requirements Note',
-        'Phone',
-        'Email',
-        'Remarks',
-        'Date'
+        '1. Programming Skills (Beginner / Intermediate / Advanced)',
+        '2. Google Docs & MS Word (Beginner / Intermediate / Advanced)',
+        '3. Google Sheets & MS Excel (Beginner / Intermediate / Advanced)',
+        '4. Google Forms (Beginner / Intermediate / Advanced)',
+        '5. Report Writing Skills (i. Beginner / ii. Advanced)',
+        '6. English Communication (Beginner / Intermediate / Advanced)',
+        '7. Present Academic Requirements (Extra Periods / Special Classes)',
+        'Specific Requirements Note / Timing',
+        'Phone Number',
+        'Email Address',
+        'Teacher Remarks'
       ];
       const rows = requestsDb.map(r => {
-        const skillsSummary = r.skillRatings
-          ? `P:${r.skillRatings.programming || '-'}; W:${r.skillRatings.googleDocsWord || '-'}; S:${r.skillRatings.googleSheetsExcel || '-'}; F:${r.skillRatings.googleForms || '-'}; R:${r.skillRatings.reportWriting || '-'}; E:${r.skillRatings.englishCommunication || '-'}`
-          : '';
-        const reqsSummary = (r.academicRequirements || []).join('; ');
+        const escape = (val: string | undefined | null) => `"${(val || '').replace(/"/g, '""')}"`;
+        const reqList = (r.academicRequirements && r.academicRequirements.length > 0)
+          ? r.academicRequirements.join('; ')
+          : 'None selected';
+
         return [
-          `"${r.id}"`,
-          `"${(r.studentName || '').replace(/"/g, '""')}"`,
-          `"${r.rollNumber}"`,
-          `"${r.className}"`,
-          `"${r.section || ''}"`,
-          `"${(r.previousCollegeName || '').replace(/"/g, '""')}"`,
-          `"${r.category}"`,
-          `"${(r.title || '').replace(/"/g, '""')}"`,
-          `"${r.status}"`,
-          `"${r.urgency}"`,
-          `"${skillsSummary.replace(/"/g, '""')}"`,
-          `"${reqsSummary.replace(/"/g, '""')}"`,
-          `"${(r.extraRequirementsNote || '').replace(/"/g, '""')}"`,
-          `"${r.phone || ''}"`,
-          `"${r.email || ''}"`,
-          `"${(r.teacherRemarks || '').replace(/"/g, '""')}"`,
-          `"${r.createdAt}"`
-        ];
+          escape(r.id),
+          escape(r.createdAt),
+          escape(r.studentName),
+          escape(r.rollNumber),
+          escape(r.className),
+          escape(r.section || ''),
+          escape(r.previousCollegeName || 'N/A'),
+          escape(r.category),
+          escape(r.title),
+          escape(r.description),
+          escape(r.status),
+          escape(r.urgency),
+          escape(r.skillRatings?.programming || 'Not Answered'),
+          escape(r.skillRatings?.googleDocsWord || 'Not Answered'),
+          escape(r.skillRatings?.googleSheetsExcel || 'Not Answered'),
+          escape(r.skillRatings?.googleForms || 'Not Answered'),
+          escape(r.skillRatings?.reportWriting || 'Not Answered'),
+          escape(r.skillRatings?.englishCommunication || 'Not Answered'),
+          escape(reqList),
+          escape(r.extraRequirementsNote || ''),
+          escape(r.phone || ''),
+          escape(r.email || ''),
+          escape(r.teacherRemarks || '')
+        ].join(',');
       });
-      const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\r\n');
+      const csv = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
       res.setHeader('Content-Disposition', `attachment; filename="student_database_${new Date().toISOString().slice(0, 10)}.csv"`);
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       return res.send(csv);
