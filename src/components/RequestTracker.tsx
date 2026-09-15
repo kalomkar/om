@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Clock, CheckCircle, AlertTriangle, FileText, ArrowRight, Printer, RefreshCw } from 'lucide-react';
+import { Search, Clock, CheckCircle, AlertTriangle, FileText, ArrowRight, Printer, RefreshCw, GraduationCap, Award, BookOpen } from 'lucide-react';
 import { StudentRequest } from '../types';
 import { CATEGORIES, STATUS_CONFIG } from '../utils/categories';
 
@@ -236,6 +236,15 @@ export const RequestTracker: React.FC<RequestTrackerProps> = ({ initialTrackingI
                 <span className="text-slate-400 block">Class & Section:</span>
                 <span className="font-semibold text-slate-800">{request.className} {request.section}</span>
               </div>
+              {request.previousCollegeName && (
+                <div className="col-span-2 pt-1">
+                  <span className="text-slate-400 block">Previous College / School:</span>
+                  <span className="font-semibold text-slate-800 flex items-center gap-1 mt-0.5">
+                    <GraduationCap className="w-3.5 h-3.5 text-indigo-500" />
+                    {request.previousCollegeName}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div>
@@ -249,6 +258,81 @@ export const RequestTracker: React.FC<RequestTrackerProps> = ({ initialTrackingI
                 {request.description}
               </p>
             </div>
+
+            {/* Self-Rating Skills Breakdown if present */}
+            {request.skillRatings && Object.values(request.skillRatings).some(Boolean) && (
+              <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/80 space-y-2">
+                <span className="text-slate-500 font-semibold uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+                  <Award className="w-3.5 h-3.5 text-indigo-600" />
+                  Your Self-Rating Assessment:
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
+                  {request.skillRatings.programming && (
+                    <div className="p-1.5 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+                      <span className="text-slate-600">Programming:</span>
+                      <span className="font-semibold text-blue-700">{request.skillRatings.programming}</span>
+                    </div>
+                  )}
+                  {request.skillRatings.googleDocsWord && (
+                    <div className="p-1.5 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+                      <span className="text-slate-600">Docs / Word:</span>
+                      <span className="font-semibold text-indigo-700">{request.skillRatings.googleDocsWord}</span>
+                    </div>
+                  )}
+                  {request.skillRatings.googleSheetsExcel && (
+                    <div className="p-1.5 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+                      <span className="text-slate-600">Sheets / Excel:</span>
+                      <span className="font-semibold text-emerald-700">{request.skillRatings.googleSheetsExcel}</span>
+                    </div>
+                  )}
+                  {request.skillRatings.googleForms && (
+                    <div className="p-1.5 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+                      <span className="text-slate-600">Forms:</span>
+                      <span className="font-semibold text-purple-700">{request.skillRatings.googleForms}</span>
+                    </div>
+                  )}
+                  {request.skillRatings.reportWriting && (
+                    <div className="p-1.5 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+                      <span className="text-slate-600">Report Writing:</span>
+                      <span className="font-semibold text-amber-700">{request.skillRatings.reportWriting}</span>
+                    </div>
+                  )}
+                  {request.skillRatings.englishCommunication && (
+                    <div className="p-1.5 bg-white rounded-lg border border-slate-200 flex items-center justify-between">
+                      <span className="text-slate-600">English Comm:</span>
+                      <span className="font-semibold text-teal-700">{request.skillRatings.englishCommunication}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Present Academic Requirements Tags & Notes */}
+            {((request.academicRequirements && request.academicRequirements.length > 0) || request.extraRequirementsNote) && (
+              <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-200/70 space-y-1.5">
+                <span className="text-[11px] text-blue-900 font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                  Your Present Academic Requirements:
+                </span>
+                {request.academicRequirements && request.academicRequirements.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    {request.academicRequirements.map((item, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-0.5 bg-white text-blue-800 border border-blue-200 rounded-md text-[11px] font-semibold"
+                      >
+                        ✓ {item}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {request.extraRequirementsNote && (
+                  <p className="text-xs text-slate-700 pt-1">
+                    <span className="font-semibold text-slate-900">Your Note:</span> {request.extraRequirementsNote}
+                  </p>
+                )}
+              </div>
+            )}
 
             {request.attachedFile && (
               <div className="pt-1">

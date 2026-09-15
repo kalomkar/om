@@ -9,12 +9,23 @@ interface StudentRequestItem {
   rollNumber: string;
   className: string;
   section?: string;
+  previousCollegeName?: string;
   phone: string;
   email: string;
   category: string;
   title: string;
   description: string;
   urgency: string;
+  skillRatings?: {
+    programming?: string;
+    googleDocsWord?: string;
+    googleSheetsExcel?: string;
+    googleForms?: string;
+    reportWriting?: string;
+    englishCommunication?: string;
+  };
+  academicRequirements?: string[];
+  extraRequirementsNote?: string;
   attachedFile?: {
     name: string;
     size: number;
@@ -193,12 +204,16 @@ async function startServer() {
         rollNumber,
         className,
         section,
+        previousCollegeName,
         phone,
         email,
         category,
         title,
         description,
         urgency,
+        skillRatings,
+        academicRequirements,
+        extraRequirementsNote,
         attachedFile,
       } = req.body;
 
@@ -217,12 +232,16 @@ async function startServer() {
         rollNumber: String(rollNumber).trim().toUpperCase(),
         className: String(className || 'Class Student').trim(),
         section: section ? String(section).trim() : undefined,
+        previousCollegeName: previousCollegeName ? String(previousCollegeName).trim() : undefined,
         phone: String(phone || '').trim(),
         email: String(email || '').trim(),
         category: category || 'document',
         title: String(title).trim(),
         description: String(description).trim(),
         urgency: urgency || 'normal',
+        skillRatings: skillRatings || undefined,
+        academicRequirements: Array.isArray(academicRequirements) ? academicRequirements : undefined,
+        extraRequirementsNote: extraRequirementsNote ? String(extraRequirementsNote).trim() : undefined,
         attachedFile: attachedFile ? {
           name: attachedFile.name,
           size: attachedFile.size,
@@ -330,22 +349,50 @@ async function startServer() {
       res.setHeader('Content-Type', 'application/json');
       return res.send(JSON.stringify(requestsDb, null, 2));
     } else {
-      const headers = ['Tracking ID', 'Student Name', 'Roll Number', 'Class', 'Section', 'Category', 'Subject', 'Status', 'Urgency', 'Phone', 'Email', 'Remarks', 'Date'];
-      const rows = requestsDb.map(r => [
-        `"${r.id}"`,
-        `"${(r.studentName || '').replace(/"/g, '""')}"`,
-        `"${r.rollNumber}"`,
-        `"${r.className}"`,
-        `"${r.section || ''}"`,
-        `"${r.category}"`,
-        `"${(r.title || '').replace(/"/g, '""')}"`,
-        `"${r.status}"`,
-        `"${r.urgency}"`,
-        `"${r.phone || ''}"`,
-        `"${r.email || ''}"`,
-        `"${(r.teacherRemarks || '').replace(/"/g, '""')}"`,
-        `"${r.createdAt}"`
-      ]);
+      const headers = [
+        'Tracking ID',
+        'Student Name',
+        'Roll Number',
+        'Class',
+        'Section',
+        'Previous College',
+        'Category',
+        'Subject',
+        'Status',
+        'Urgency',
+        'Skill Ratings (Prog/Docs/Sheets/Forms/Report/Eng)',
+        'Academic Requirements',
+        'Requirements Note',
+        'Phone',
+        'Email',
+        'Remarks',
+        'Date'
+      ];
+      const rows = requestsDb.map(r => {
+        const skillsSummary = r.skillRatings
+          ? `P:${r.skillRatings.programming || '-'}; W:${r.skillRatings.googleDocsWord || '-'}; S:${r.skillRatings.googleSheetsExcel || '-'}; F:${r.skillRatings.googleForms || '-'}; R:${r.skillRatings.reportWriting || '-'}; E:${r.skillRatings.englishCommunication || '-'}`
+          : '';
+        const reqsSummary = (r.academicRequirements || []).join('; ');
+        return [
+          `"${r.id}"`,
+          `"${(r.studentName || '').replace(/"/g, '""')}"`,
+          `"${r.rollNumber}"`,
+          `"${r.className}"`,
+          `"${r.section || ''}"`,
+          `"${(r.previousCollegeName || '').replace(/"/g, '""')}"`,
+          `"${r.category}"`,
+          `"${(r.title || '').replace(/"/g, '""')}"`,
+          `"${r.status}"`,
+          `"${r.urgency}"`,
+          `"${skillsSummary.replace(/"/g, '""')}"`,
+          `"${reqsSummary.replace(/"/g, '""')}"`,
+          `"${(r.extraRequirementsNote || '').replace(/"/g, '""')}"`,
+          `"${r.phone || ''}"`,
+          `"${r.email || ''}"`,
+          `"${(r.teacherRemarks || '').replace(/"/g, '""')}"`,
+          `"${r.createdAt}"`
+        ];
+      });
       const csv = [headers.join(','), ...rows.map(row => row.join(','))].join('\r\n');
       res.setHeader('Content-Disposition', `attachment; filename="student_database_${new Date().toISOString().slice(0, 10)}.csv"`);
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');

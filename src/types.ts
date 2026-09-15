@@ -12,6 +12,17 @@ export type RequestUrgency = 'normal' | 'high' | 'urgent';
 
 export type RequestStatus = 'pending' | 'in_review' | 'approved' | 'rejected' | 'resolved';
 
+export type SkillRatingLevel = 'Beginner' | 'Intermediate' | 'Advanced';
+
+export interface SkillRatings {
+  programming?: SkillRatingLevel;
+  googleDocsWord?: SkillRatingLevel;
+  googleSheetsExcel?: SkillRatingLevel;
+  googleForms?: SkillRatingLevel;
+  reportWriting?: 'Beginner' | 'Advanced' | 'Intermediate';
+  englishCommunication?: SkillRatingLevel;
+}
+
 export interface AttachedDocument {
   name: string;
   size: number;
@@ -25,12 +36,16 @@ export interface StudentRequest {
   rollNumber: string;
   className: string;
   section?: string;
+  previousCollegeName?: string;
   phone: string;
   email: string;
   category: RequestCategory;
   title: string;
   description: string;
   urgency: RequestUrgency;
+  skillRatings?: SkillRatings;
+  academicRequirements?: string[];
+  extraRequirementsNote?: string;
   attachedFile?: AttachedDocument;
   status: RequestStatus;
   teacherRemarks?: string;

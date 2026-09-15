@@ -24,7 +24,11 @@ import {
   Calendar,
   AlertCircle,
   Database,
-  UserPlus
+  UserPlus,
+  GraduationCap,
+  Award,
+  BookOpen,
+  Code2
 } from 'lucide-react';
 import { StudentRequest, RequestStatus } from '../types';
 import { CATEGORIES, STATUS_CONFIG, URGENCY_CONFIG } from '../utils/categories';
@@ -451,6 +455,12 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                       <p className="text-xs text-slate-500 mt-0.5">
                         {req.className} {req.section ? `• ${req.section}` : ''}
                       </p>
+                      {req.previousCollegeName && (
+                        <p className="text-[11px] text-slate-600 mt-0.5 flex items-center gap-1 font-medium">
+                          <GraduationCap className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                          <span>Prev. College: <b className="text-slate-800">{req.previousCollegeName}</b></span>
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -483,6 +493,100 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                     {req.description}
                   </p>
                 </div>
+
+                {/* Student Self-Rating Assessment breakdown if present */}
+                {req.skillRatings && Object.values(req.skillRatings).some(Boolean) && (
+                  <div className="p-3 bg-slate-50/90 rounded-xl border border-slate-200/80 space-y-2">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-indigo-900">
+                      <span className="flex items-center gap-1.5">
+                        <Award className="w-3.5 h-3.5 text-indigo-600" />
+                        Student Self-Rating Assessment:
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
+                      {req.skillRatings.programming && (
+                        <div className="p-1.5 bg-white rounded-lg border border-slate-200/70 flex items-center justify-between">
+                          <span className="text-slate-600 font-medium">Programming:</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
+                            req.skillRatings.programming === 'Advanced' ? 'bg-emerald-100 text-emerald-800' :
+                            req.skillRatings.programming === 'Intermediate' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700'
+                          }`}>{req.skillRatings.programming}</span>
+                        </div>
+                      )}
+                      {req.skillRatings.googleDocsWord && (
+                        <div className="p-1.5 bg-white rounded-lg border border-slate-200/70 flex items-center justify-between">
+                          <span className="text-slate-600 font-medium">Docs & Word:</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
+                            req.skillRatings.googleDocsWord === 'Advanced' ? 'bg-emerald-100 text-emerald-800' :
+                            req.skillRatings.googleDocsWord === 'Intermediate' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700'
+                          }`}>{req.skillRatings.googleDocsWord}</span>
+                        </div>
+                      )}
+                      {req.skillRatings.googleSheetsExcel && (
+                        <div className="p-1.5 bg-white rounded-lg border border-slate-200/70 flex items-center justify-between">
+                          <span className="text-slate-600 font-medium">Sheets & Excel:</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
+                            req.skillRatings.googleSheetsExcel === 'Advanced' ? 'bg-emerald-100 text-emerald-800' :
+                            req.skillRatings.googleSheetsExcel === 'Intermediate' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700'
+                          }`}>{req.skillRatings.googleSheetsExcel}</span>
+                        </div>
+                      )}
+                      {req.skillRatings.googleForms && (
+                        <div className="p-1.5 bg-white rounded-lg border border-slate-200/70 flex items-center justify-between">
+                          <span className="text-slate-600 font-medium">Google Forms:</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
+                            req.skillRatings.googleForms === 'Advanced' ? 'bg-emerald-100 text-emerald-800' :
+                            req.skillRatings.googleForms === 'Intermediate' ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-700'
+                          }`}>{req.skillRatings.googleForms}</span>
+                        </div>
+                      )}
+                      {req.skillRatings.reportWriting && (
+                        <div className="p-1.5 bg-white rounded-lg border border-slate-200/70 flex items-center justify-between">
+                          <span className="text-slate-600 font-medium">Report Writing:</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
+                            req.skillRatings.reportWriting === 'Advanced' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                          }`}>{req.skillRatings.reportWriting}</span>
+                        </div>
+                      )}
+                      {req.skillRatings.englishCommunication && (
+                        <div className="p-1.5 bg-white rounded-lg border border-slate-200/70 flex items-center justify-between">
+                          <span className="text-slate-600 font-medium">English Comm:</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[11px] font-semibold ${
+                            req.skillRatings.englishCommunication === 'Advanced' ? 'bg-emerald-100 text-emerald-800' :
+                            req.skillRatings.englishCommunication === 'Intermediate' ? 'bg-teal-100 text-teal-800' : 'bg-slate-100 text-slate-700'
+                          }`}>{req.skillRatings.englishCommunication}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Present Academic Requirements Tags & Notes */}
+                {((req.academicRequirements && req.academicRequirements.length > 0) || req.extraRequirementsNote) && (
+                  <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-200/70 space-y-1.5">
+                    <div className="text-[11px] text-blue-900 font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                      <span>Present Academic Requirements & Extra Periods Needed:</span>
+                    </div>
+                    {req.academicRequirements && req.academicRequirements.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {req.academicRequirements.map((item, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-0.5 bg-white text-blue-900 border border-blue-200 rounded-md text-[11px] font-semibold shadow-2xs"
+                          >
+                            ✓ {item}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {req.extraRequirementsNote && (
+                      <p className="text-xs text-slate-700 pt-1">
+                        <span className="font-semibold text-slate-900">Student Note:</span> {req.extraRequirementsNote}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 {/* Attached File Preview if available */}
                 {req.attachedFile && (
