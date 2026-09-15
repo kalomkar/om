@@ -28,13 +28,15 @@ import {
   GraduationCap,
   Award,
   BookOpen,
-  Code2
+  Code2,
+  BarChart3
 } from 'lucide-react';
 import { StudentRequest, RequestStatus } from '../types';
 import { CATEGORIES, STATUS_CONFIG, URGENCY_CONFIG } from '../utils/categories';
 import { DatabaseModal } from './DatabaseModal';
 import { AddTeacherModal } from './AddTeacherModal';
 import { ProjectReportModal } from './ProjectReportModal';
+import { AnalyticsModal } from './AnalyticsModal';
 import { createTeacherStatusUpdateWhatsAppUrl } from '../utils/whatsapp';
 
 interface TeacherDashboardProps {
@@ -67,6 +69,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
   const [isDbModalOpen, setIsDbModalOpen] = useState(false);
   const [isAddTeacherOpen, setIsAddTeacherOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isAnalyticsModalOpen, setIsAnalyticsModalOpen] = useState(false);
 
   const studentShareUrl = portalUrl.includes('?') 
     ? `${portalUrl}&mode=student` 
@@ -198,12 +201,89 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
       ].join(',');
     });
 
-    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+    // === AUTOMATED ANALYSIS SECTION ===
+    const totalCount = requests.length;
+
+    // 1. Technical Skills Aggregation
+    const skillList = [
+      { key: 'programming', name: '1. Programming Skills' },
+      { key: 'googleDocsWord', name: '2. Google Docs & MS Word' },
+      { key: 'googleSheetsExcel', name: '3. Google Sheets & MS Excel' },
+      { key: 'googleForms', name: '4. Google Forms' },
+      { key: 'reportWriting', name: '5. Report Writing Skills' },
+      { key: 'englishCommunication', name: '6. English Communication' }
+    ] as const;
+
+    const skillSummaryRows = skillList.map(s => {
+      let beg = 0, inter = 0, adv = 0;
+      requests.forEach(r => {
+        const val = r.skillRatings?.[s.key];
+        if (val === 'Beginner') beg++;
+        else if (val === 'Intermediate') inter++;
+        else if (val === 'Advanced') adv++;
+      });
+      const totalRated = beg + inter + adv || 1;
+      return [
+        escape(s.name),
+        escape(`${beg} (${Math.round((beg / totalRated) * 100)}%)`),
+        escape(`${inter} (${Math.round((inter / totalRated) * 100)}%)`),
+        escape(`${adv} (${Math.round((adv / totalRated) * 100)}%)`),
+        escape(String(totalRated))
+      ].join(',');
+    });
+
+    // 2. Academic Requirements Aggregation
+    const reqOptions = [
+      'Extra Periods / Doubt Classes',
+      'Website Design',
+      'English Grammar & Communication',
+      'Project Work with Report Writing',
+      'Interview Preparation',
+      'Presentation Slides'
+    ];
+
+    const reqSummaryRows = reqOptions.map(reqName => {
+      let count = 0;
+      requests.forEach(r => {
+        if (r.academicRequirements?.includes(reqName)) count++;
+      });
+      const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+      const priority = pct >= 50 ? 'High Demand' : pct >= 25 ? 'Medium Demand' : 'Standard Demand';
+      return [
+        escape(reqName),
+        escape(String(count)),
+        escape(`${pct}%`),
+        escape(priority)
+      ].join(',');
+    });
+
+    const analysisLines = [
+      '',
+      '========================================================================================================',
+      escape('AUTOMATED DATA ANALYSIS & FACULTY SUMMARY REPORT (EXCEL AUTO-ANALYSIS)'),
+      escape(`Generated Automatically: ${new Date().toLocaleString()} | Total Students Analyzed: ${totalCount}`),
+      '========================================================================================================',
+      '',
+      escape('--- PART 1: TECHNICAL & SOFTWARE SKILLS SELF-ASSESSMENT DISTRIBUTION ---'),
+      ['Skill Category', 'Beginner Count (%)', 'Intermediate Count (%)', 'Advanced Count (%)', 'Total Assessed'].map(escape).join(','),
+      ...skillSummaryRows,
+      '',
+      escape('--- PART 2: PRESENT ACADEMIC REQUIREMENTS DEMAND BREAKDOWN ---'),
+      ['Academic Requirement / Subject', 'Student Count', 'Percentage (%)', 'Priority Level'].map(escape).join(','),
+      ...reqSummaryRows,
+      '',
+      escape('--- PART 3: AUTOMATED FACULTY ACTION PLAN ---'),
+      escape('Recommendation 1: Organize special extra periods or workshops for top demanded subjects (>50% demand).'),
+      escape('Recommendation 2: Arrange foundational lab sessions for students marked as Beginner in Programming or Report Writing.'),
+      escape('Recommendation 3: Coordinate with department faculty to schedule mock interviews and project report guides.')
+    ];
+
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows, ...analysisLines].join('\r\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `student_requests_detailed_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `student_requests_analyzed_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -374,6 +454,16 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
                 <option key={c.id} value={c.id}>{c.label}</option>
               ))}
             </select>
+
+            <button
+              id="open-auto-analysis-btn"
+              onClick={() => setIsAnalyticsModalOpen(true)}
+              title="View automated analysis of skills and requirements"
+              className="px-3.5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-xs active:scale-95 shrink-0"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-purple-200" />
+              <span>Auto Analysis</span>
+            </button>
 
             <button
               id="open-database-explorer-btn"
@@ -881,6 +971,14 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({
       <ProjectReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
+      />
+
+      {/* Automated Student Data Analytics Modal */}
+      <AnalyticsModal
+        isOpen={isAnalyticsModalOpen}
+        onClose={() => setIsAnalyticsModalOpen(false)}
+        requests={requests}
+        onExportCSV={handleExportCSV}
       />
     </div>
   );

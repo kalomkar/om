@@ -450,8 +450,87 @@ async function startServer() {
           escape(r.teacherRemarks || '')
         ].join(',');
       });
-      const csv = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
-      res.setHeader('Content-Disposition', `attachment; filename="student_database_${new Date().toISOString().slice(0, 10)}.csv"`);
+
+      // === AUTOMATED ANALYSIS SECTION ===
+      const totalCount = requestsDb.length;
+      const escape = (val: string | undefined | null) => `"${(val || '').replace(/"/g, '""')}"`;
+
+      // 1. Technical Skills Aggregation
+      const skillList = [
+        { key: 'programming', name: '1. Programming Skills' },
+        { key: 'googleDocsWord', name: '2. Google Docs & MS Word' },
+        { key: 'googleSheetsExcel', name: '3. Google Sheets & MS Excel' },
+        { key: 'googleForms', name: '4. Google Forms' },
+        { key: 'reportWriting', name: '5. Report Writing Skills' },
+        { key: 'englishCommunication', name: '6. English Communication' }
+      ] as const;
+
+      const skillSummaryRows = skillList.map(s => {
+        let beg = 0, inter = 0, adv = 0;
+        requestsDb.forEach(r => {
+          const val = r.skillRatings?.[s.key];
+          if (val === 'Beginner') beg++;
+          else if (val === 'Intermediate') inter++;
+          else if (val === 'Advanced') adv++;
+        });
+        const totalRated = beg + inter + adv || 1;
+        return [
+          escape(s.name),
+          escape(`${beg} (${Math.round((beg / totalRated) * 100)}%)`),
+          escape(`${inter} (${Math.round((inter / totalRated) * 100)}%)`),
+          escape(`${adv} (${Math.round((adv / totalRated) * 100)}%)`),
+          escape(String(totalRated))
+        ].join(',');
+      });
+
+      // 2. Academic Requirements Aggregation
+      const reqOptions = [
+        'Extra Periods / Doubt Classes',
+        'Website Design',
+        'English Grammar & Communication',
+        'Project Work with Report Writing',
+        'Interview Preparation',
+        'Presentation Slides'
+      ];
+
+      const reqSummaryRows = reqOptions.map(reqName => {
+        let count = 0;
+        requestsDb.forEach(r => {
+          if (r.academicRequirements?.includes(reqName)) count++;
+        });
+        const pct = totalCount > 0 ? Math.round((count / totalCount) * 100) : 0;
+        const priority = pct >= 50 ? 'High Demand' : pct >= 25 ? 'Medium Demand' : 'Standard Demand';
+        return [
+          escape(reqName),
+          escape(String(count)),
+          escape(`${pct}%`),
+          escape(priority)
+        ].join(',');
+      });
+
+      const analysisLines = [
+        '',
+        '========================================================================================================',
+        escape('AUTOMATED DATA ANALYSIS & FACULTY SUMMARY REPORT (EXCEL AUTO-ANALYSIS)'),
+        escape(`Generated Automatically: ${new Date().toLocaleString()} | Total Students Analyzed: ${totalCount}`),
+        '========================================================================================================',
+        '',
+        escape('--- PART 1: TECHNICAL & SOFTWARE SKILLS SELF-ASSESSMENT DISTRIBUTION ---'),
+        ['Skill Category', 'Beginner Count (%)', 'Intermediate Count (%)', 'Advanced Count (%)', 'Total Assessed'].map(escape).join(','),
+        ...skillSummaryRows,
+        '',
+        escape('--- PART 2: PRESENT ACADEMIC REQUIREMENTS DEMAND BREAKDOWN ---'),
+        ['Academic Requirement / Subject', 'Student Count', 'Percentage (%)', 'Priority Level'].map(escape).join(','),
+        ...reqSummaryRows,
+        '',
+        escape('--- PART 3: AUTOMATED FACULTY ACTION PLAN ---'),
+        escape('Recommendation 1: Organize special extra periods or workshops for top demanded subjects (>50% demand).'),
+        escape('Recommendation 2: Arrange foundational lab sessions for students marked as Beginner in Programming or Report Writing.'),
+        escape('Recommendation 3: Coordinate with department faculty to schedule mock interviews and project report guides.')
+      ];
+
+      const csv = '\uFEFF' + [headers.join(','), ...rows, ...analysisLines].join('\r\n');
+      res.setHeader('Content-Disposition', `attachment; filename="student_database_analyzed_${new Date().toISOString().slice(0, 10)}.csv"`);
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       return res.send(csv);
     }
